@@ -1,0 +1,4155 @@
+<?xml version="1.0"?>
+<!--
+    Runes of Magic protocol definitions
+    Copyright (C) 2013-2015 Rink Springer <rink@rink.nu>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License version 3
+    as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!--
+    Note: if you are using this file to analyse a more recent version of the
+    game than 6.0.5.2679.en, you'll need to update the 'char_info' structure as
+    some fields have been added to it since then; search for UPDATE and
+    uncomment the fields.
+  -->
+<protocol>
+	<define name="accountname_length" value="64"/>
+	<define name="password_length" value="256"/>
+	<define name="clientid_length" value="256"/>
+	<define name="charname_length" value="32"/>
+
+	<enum name="class">
+		<value num="0" name="gm"/>
+		<value num="1" name="warrior"/>
+		<value num="2" name="scout"/>
+		<value num="3" name="rogue"/>
+		<value num="4" name="mage"/>
+		<value num="5" name="priest"/>
+		<value num="6" name="knight"/>
+		<value num="7" name="warden"/>
+		<value num="8" name="druid"/>
+		<value num="9" name="warlock"/>
+		<value num="10" name="champion"/>
+		<value num="0xffffffff" name="none"/>
+	</enum>
+
+	<enum name="server_status">
+		<value num="0" name="normal"/>
+		<value num="1" name="repair"/>
+		<value num="2" name="hidden"/>
+	</enum>
+
+	<enum name="loginfailure_error">
+		<value num="1" name="account_password_invalid"/>
+		<value num="2" name="world_not_open"/>
+		<value num="3" name="account_validity_expired"/>
+		<value num="4" name="ip_rejected"/>
+	</enum>
+
+	<enum name="look_values">
+		<value num="0x3e8" name="human_male"/>
+		<value num="0x3e9" name="human_female"/>
+		<value num="0x3ea" name="elf_male"/>
+		<value num="0x3eb" name="elf_female"/>
+		<value num="0x3ec" name="dwarf_male"/>
+	</enum>
+
+	<enum name="parameters">
+		<value num="0" name="0"/>
+		<value num="1" name="1"/>
+		<value num="2" name="2"/>
+		<value num="3" name="3"/>
+		<value num="4" name="4"/>
+		<value num="5" name="5"/>
+		<value num="6" name="6"/>
+		<value num="7" name="7"/>
+		<value num="8" name="8"/>
+		<value num="9" name="9"/>
+		<value num="10" name="10"/>
+		<value num="11" name="11"/> <!-- contains item set skill id's -->
+		<value num="12" name="12"/>
+		<value num="13" name="13"/> <!-- wonder if this is mail -->
+	</enum>
+
+	<enum name="useskilleffect_attr">
+		<value num="0" name="hp"/>
+		<value num="1" name="mp"/>
+		<value num="2" name="pri"/>
+		<value num="3" name="sec"/>
+	</enum>
+
+  <enum name="useskilleffect_type">
+		<value num="0" name="se_miss"/>
+		<value num="1" name="se_normal"/>
+		<value num="2" name="se_critical"/>
+		<value num="3" name="se_immune"/>
+		<value num="4" name="se_absorb"/>
+	</enum>
+
+	<enum name="tiering">
+		<value num="0xa" name="plus_0"/>
+		<value num="0xb" name="plus_1"/>
+		<value num="0xc" name="plus_2"/>
+		<value num="0xd" name="plus_3"/>
+		<value num="0xe" name="plus_4"/>
+		<value num="0xf" name="plus_5"/>
+		<value num="0x10" name="plus_6"/>
+	</enum>
+
+	<enum name="obj_status">
+		<value num="3" name="red"/> <!-- with sword icon -->
+		<value num="4" name="brown"/> <!-- with sword icon -->
+		<value num="5" name="green"/>
+	</enum>
+
+	<enum name="hit_type">
+		<value num="0" name="miss"/>
+		<value num="1" name="dodge"/>
+		<value num="2" name="parry"/>
+		<value num="3" name="standard"/>
+		<value num="4" name="critical"/>
+	</enum>
+
+	<enum name="targets">
+		<value num="0xc" name="masterserver"/>
+		<value num="0xe" name="datacenter"/>
+		<value num="0x10" name="chatsrv"/>
+	</enum>
+
+	<enum name="stat_index">
+		<value num="0x3" name="class1"/>
+		<value num="0x5" name="xp"/>
+		<value num="0x18" name="class2"/>
+		<value num="0x1f" name="tp"/>
+		<value num="0x25" name="bonus_xp"/>
+		<value num="0x26" name="bonus_tp"/>
+		<!-- weapon/crafting/gathering skills are in form level.percentage -->
+		<value num="0x2bc" name="unarmed"/>
+		<value num="0x2bd" name="sword"/>
+		<value num="0x2be" name="dagger"/>
+		<value num="0x2bf" name="wand"/>
+		<value num="0x2c0" name="1h_axe"/>
+		<value num="0x2c1" name="1h_hammer"/>
+		<value num="0x2c2" name="2h_sword"/>
+		<value num="0x2c3" name="staff"/>
+		<value num="0x2c4" name="2h_axe"/>
+		<value num="0x2c5" name="2h_hammer"/>
+		<value num="0x2c6" name="spear"/>
+		<value num="0x2c7" name="bow"/>
+		<value num="0x2c8" name="crossbow"/>
+		<value num="0x2c9" name="gun"/>
+		<value num="0x2ca" name="physical_defense"/>
+		<value num="0x2cb" name="blacksmithing"/>
+		<value num="0x2cc" name="carpentry"/>
+		<value num="0x2cd" name="armorcrafting"/>
+		<value num="0x2ce" name="tailoring"/>
+		<value num="0x2cf" name="cooking"/>
+		<value num="0x2d0" name="alchemy"/>
+		<value num="0x2d1" name="mining"/>
+		<value num="0x2d2" name="woodcutting"/>
+		<value num="0x2d3" name="herbalism"/>
+		<value num="0x2d4" name="fishing"/>
+		<value num="0x2d5" name="planting"/>
+	</enum>
+
+	<enum name="relation_type">
+		<value num="3" name="disciple"/>
+		<value num="4" name="master"/>
+		<value num="5" name="spouse5"/>
+		<value num="6" name="spouse6"/>
+		<value num="7" name="lover"/>
+		<value num="8" name="family"/>
+		<value num="9" name="close_friend"/>
+	</enum>
+
+	<enum name="bound_type">
+		<value num="1" name="non_bindable"/>
+		<value num="2" name="bound"/>
+		<value num="3" name="on_equip"/>
+	</enum>
+
+	<enum name="move_type">
+		<value num="0" name="move"/>
+		<value num="1" name="jump"/>
+		<value num="6" name="status"/>
+	</enum>
+
+	<struct name="char_appearance">
+		<field type="u8" name="head_size"/>
+		<field type="u8" name="unk1"/>
+		<field type="u8" name="height"/>
+		<field type="u8" name="chest_size"/>
+		<field type="u8" name="hip_size"/>
+		<field type="u8" name="arm_size"/>
+		<field type="u8" name="forearm_size"/>
+		<field type="u8" name="hand_size"/>
+		<field type="u8" name="leg_size"/>
+		<field type="u8" name="calf_size"/>
+		<field type="u8" name="feet_size"/>
+		<field type="u8" name="unk2"/>
+		<field type="u8" name="unk3"/>
+		<field type="u8" name="unk4"/>
+		<field type="u8" name="unk5"/>
+		<field type="u8" name="unk6"/> <!-- 0xff ? -->
+		<field type="u8" name="unk7"/>
+		<field type="u8" name="hair_color" count="3"/>
+		<field type="u8" name="unk8" count="3"/>
+		<field type="u8" name="body_tint"/>
+		<field type="u32" name="face_beard"/>
+		<field type="u32" name="hair"/>
+	</struct>
+
+	<struct name="object_appearance">
+		<field type="u8" name="unk1"/>
+		<field type="u8" name="unk2"/>
+		<field type="u8" name="unk3"/>
+		<field type="u8" name="unk4"/>
+		<field type="u8" name="unk5"/>
+		<field type="u8" name="unk6"/>
+		<field type="u8" name="unk7"/>
+		<field type="u8" name="unk8"/>
+		<field type="u8" name="unk9"/>
+		<field type="u8" name="unk10"/>
+		<field type="u8" name="unk11"/>
+		<field type="u8" name="unk12"/>
+		<field type="u8" name="unk13"/>
+		<field type="u8" name="unk14"/>
+		<field type="u8" name="unk15"/>
+		<field type="u8" name="unk16"/>
+		<field type="u8" name="unk17"/>
+		<field type="u8" name="unk18"/>
+		<field type="u8" name="unk19"/>
+		<field type="u8" name="unk20"/>
+		<field type="u8" name="unk21"/>
+		<field type="u8" name="unk22"/>
+		<field type="u8" name="unk23"/>
+		<field type="u8" name="unk24"/>
+		<field type="u8" name="unk25"/>
+		<field type="u8" name="unk26"/>
+		<field type="u8" name="unk27"/>
+		<field type="u8" name="unk28"/>
+		<field type="u8" name="unk29"/>
+		<field type="u8" name="unk30"/>
+		<field type="u8" name="unk31"/>
+		<field type="u8" name="unk32"/>
+	</struct>
+
+	<struct name="item_info">
+		<field type="u32" name="itemid" annotation="sys_name"/>
+		<field type="u32" name="appearanceid" annotation="sys_name"/> <!-- not equal to previous if item has been aggregated -->
+		<field type="u32" name="unknown1"/> <!-- wonder if this is some form of id -->
+		<field type="unixtime" name="timestamp"/>
+		<field type="u32" name="quantity" format="decimal"/>
+		<field type="u8" name="durability1" format="decimal"/> <!-- max or current? -->
+		<field type="u8" name="max_durability" format="decimal"/>
+		<field type="u8" name="tier" enumeration="tiering"/>
+		<!-- format is rrppppp, where r = #runeslots and p = #plussing (0..31)-->
+		<field type="u8" name="runeslots_plussing" />
+		<field type="u32" name="cur_durability" format="decimal"/> <!-- durability * 100 -->
+		<field type="u8" name="unknown15"/>
+		<field type="u8" name="unknown16"/>
+		<field type="u8" name="unknown17"/>
+		<field type="u8" name="unknown18"/>
+		<field type="u16" name="stat1" annotation="stat_name"/>
+		<field type="u16" name="stat2" annotation="stat_name"/>
+		<field type="u16" name="stat3" annotation="stat_name"/>
+		<field type="u16" name="stat4" annotation="stat_name"/>
+		<field type="u16" name="stat5" annotation="stat_name"/>
+		<field type="u16" name="stat6" annotation="stat_name"/>
+		<field type="u16" name="rune1" annotation="stat_name"/>
+		<field type="u16" name="rune2" annotation="stat_name"/>
+		<field type="u16" name="rune3" annotation="stat_name"/>
+		<field type="u16" name="rune4" annotation="stat_name"/>
+		<field type="u8" name="unknown19" count="12"/>
+		<field type="u32" name="bound" enumeration="bound_type"/>
+	</struct>
+
+	<struct name="guild_rank">
+		<field type="u32" name="unknown1"/> <!-- permissions? -->
+		<field type="string" name="rank" length="32"/>
+	</struct>
+
+	<struct name="char_buff">
+		<field type="u32" name="unknown1" format="decimal"/>
+		<field type="u32" name="buffid" format="decimal" annotation="sys_name"/>
+		<!-- wonder if this has to do with the duration -->
+		<field type="u32" name="unknown2" format="decimal"/>
+		<field type="u32" name="level" format="decimal"/> <!-- guessed -->
+		<field type="u32" name="unknown4" format="decimal"/>
+		<field type="u32" name="unknown5" format="decimal"/>
+		<field type="u32" name="unknown6" format="decimal"/>
+	</struct>
+
+	<struct name="char_class">
+		<field type="u32" name="curxp" format="decimal"/>
+		<field type="u32" name="totaltp" format="decimal"/>
+		<field type="u32" name="curtp" format="decimal"/>
+		<field type="s32" name="xpdebt" format="decimal"/>
+		<field type="s32" name="tpdebt" format="decimal"/>
+		<field type="u32" name="bonusxp" format="decimal"/>
+		<field type="u32" name="bonustp" format="decimal"/>
+		<field type="u32" name="level" format="decimal"/>
+		<field type="u32" name="unknown3" format="decimal"/> <!-- always 0? -->
+		<field type="u32" name="unknown4" format="decimal"/>
+		<field type="u32" name="str_mod"/>
+		<field type="u32" name="sta_mod"/>
+		<field type="u32" name="wis_mod"/>
+		<field type="u32" name="intl_mod"/>
+		<field type="u32" name="dex_mod"/>
+		<field type="float" name="skill_level" count="250"/>
+	</struct>
+
+	<struct name="char_quest">
+		<field type="u32" name="questid" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="unknown1"/>
+		<field type="u32" name="unknown2"/>
+	</struct>
+
+	<struct name="char_transport">
+		<!-- unknown1 seems to be unknown2 * 256 - it seems some kind of zoneid -->
+		<field type="u32" name="unknown1"/>
+		<field type="string" name="name" length="64"/>
+		<field type="u32" name="unknown2"/>
+		<!-- x/y/z are pure guesswork -->
+		<field type="float" name="x"/>
+		<field type="float" name="y"/>
+		<field type="float" name="z"/>
+	</struct>
+
+	<struct name="pet_skill">
+		<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="unknown1"/>
+	</struct>
+
+	<struct name="char_pet">
+		<field type="string" name="name" length="32"/>
+		<field type="u32" name="eggtype" format="decimal"/>
+		<field type="unixtime" name="timestamp"/>
+		<field type="u32" name="pettype" format="decimal"/>
+		<field type="u32" name="level" format="decimal"/>
+		<field type="u32" name="unknown2"/> <!-- type? -->
+		<field type="u32" name="unknown3"/>
+		<field type="u32" name="unknown4"/>
+		<field type="u32" name="unknown5"/>
+		<field type="u32" name="experience" format="decimal"/>
+		<field type="u32" name="tp" format="decimal"/>
+		<field type="u32" name="unknown6"/>
+		<field type="u32" name="loyalty" format="decimal"/>
+		<field type="u32" name="nourishment" format="decimal"/>
+		<field type="float" name="aptitude"/>
+		<field type="u32" name="training" format="decimal"/>
+		<field type="u32" name="unknown8"/>
+		<field type="float" name="strength"/>
+		<field type="float" name="stamina"/>
+		<field type="float" name="dexterity"/>
+		<field type="float" name="intelligence"/>
+		<field type="float" name="wisdom"/>
+		<field type="u32" name="unknown9"/>
+		<field type="u32" name="unknown10"/>
+		<field type="pet_skill" name="skill1"/>
+		<field type="pet_skill" name="skill2"/>
+		<field type="pet_skill" name="skill3"/>
+		<field type="pet_skill" name="skill4"/>
+		<field type="pet_skill" name="skill5"/>
+		<field type="pet_skill" name="skill6"/>
+		<field type="pet_skill" name="skill7"/>
+		<field type="pet_skill" name="skill8"/>
+		<field type="pet_skill" name="skill9"/>
+		<field type="pet_skill" name="skill10"/>
+		<field type="u32" name="unknown11"/>
+		<field type="float" name="mining_level"/>
+		<field type="float" name="woodcutting_level"/>
+		<field type="float" name="herbalism_level"/>
+		<field type="float" name="unknown15"/>
+		<field type="u32" name="unknown16"/>
+		<field type="item_info" name="item1"/>
+		<field type="item_info" name="item2"/>
+		<field type="item_info" name="item3"/>
+		<field type="item_info" name="item4"/>
+		<field type="item_info" name="item5"/>
+		<field type="item_info" name="item6"/>
+		<field type="item_info" name="item7"/>
+		<field type="item_info" name="item8"/>
+		<field type="item_info" name="item9"/>
+	</struct>
+
+	<struct name="char_info">
+		<field type="u32" name="unknown1" /> <!-- always 499602d2 ? -->
+		<field type="u32" name="unknown2" /> <!-- always 412000b ? -->
+		<field type="u32" name="unknown3" count="266"/> <!-- always 0 ? -->
+		<field type="string" name="charname" length="charname_length"/>
+		<field type="u32" name="zoneid" format="decimal"/>
+		<field type="float" name="x"/>
+		<field type="float" name="y"/>
+		<field type="float" name="z"/>
+		<field type="float" name="angle"/>
+		<field type="u32" name="unknown4" count="5" />
+		<!-- appearance, same as ObjectAppearance -->
+		<field type="object_appearance" name="appearance"/>
+		<field type="u32" name="race" enumeration="look_values" />
+		<field type="u32" name="unknown5" count="16" /> <!-- always 0 ? -->
+		<field type="u32" name="unknown6"/> <!-- always 1 ? -->
+		<field type="u32" name="class1" enumeration="class" />
+		<field type="u32" name="class2" enumeration="class" />
+		<field type="u32" name="unknown7" />
+		<field type="float" name="unknown7a" />
+		<field type="float" name="unknown7b" />
+		<field type="u32" name="unknown7c" count="3" />
+		<!-- order of items identical to CharList -->
+		<field type="item_info" name="item_head"/>
+		<field type="item_info" name="item_hands"/>
+		<field type="item_info" name="item_boots"/>
+		<field type="item_info" name="item_upper"/>
+		<field type="item_info" name="item_lower"/>
+		<field type="item_info" name="item_cape"/>
+		<field type="item_info" name="item_belt"/>
+		<field type="item_info" name="item_shoulders"/>
+		<field type="item_info" name="item_amulet"/>
+		<field type="item_info" name="item_arrow"/>
+		<field type="item_info" name="item_bow"/>
+		<field type="item_info" name="item_ring_l"/>
+		<field type="item_info" name="item_ring_r"/>
+		<field type="item_info" name="item_earring_l"/>
+		<field type="item_info" name="item_earring_r"/>
+		<field type="item_info" name="item_weapon"/>
+		<field type="item_info" name="item_offhand"/>
+		<field type="item_info" name="item_unused1"/>
+		<field type="item_info" name="item_unused2"/>
+		<field type="item_info" name="item_unused3"/>
+		<field type="item_info" name="item_unused4"/>
+		<field type="item_info" name="item_wings"/>
+		<field type="u32" name="titleid" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="unknown8" /> <!-- 1 ? -->
+		<!-- skill overview -->
+		<field type="float" name="skill_unarmed" />
+		<field type="float" name="skill_1h_sword" />
+		<field type="float" name="skill_dagger" />
+		<field type="float" name="skill_wand" />
+		<field type="float" name="skill_1haxe" />
+		<field type="float" name="skill_1h_hammer" />
+		<field type="float" name="skill_2h_sword" />
+		<field type="float" name="skill_staff" />
+		<field type="float" name="skill_2h_axe" />
+		<field type="float" name="skill_2h_hammer" />
+		<field type="float" name="skill_2h_polearm" />
+		<field type="float" name="skill_bow" />
+		<field type="float" name="skill_crossbow" />
+		<field type="float" name="skill_gun" />
+		<field type="float" name="skill_phys_defense" />
+		<field type="float" name="skill_blacksmithing" />
+		<field type="float" name="skill_carpentry" />
+		<field type="float" name="skill_armorcrafting" />
+		<field type="float" name="skill_tailoring" />
+		<field type="float" name="skill_cooking" />
+		<field type="float" name="skill_alchemy" />
+		<field type="float" name="skill_mining" />
+		<field type="float" name="skill_woodcutting" />
+		<field type="float" name="skill_herbalism" />
+		<field type="float" name="skill_fishing" />
+		<field type="float" name="skill_planting" />
+
+		<field type="u32" name="unknown8a"/>
+		<field type="u32" name="unknown8b"/>
+		<field type="u32" name="unknown8c"/>
+		<field type="u32" name="unknown8d"/>
+		<field type="char_buff" name="char_buff1"/>
+		<field type="char_buff" name="char_buff2"/>
+		<field type="char_buff" name="char_buff3"/>
+		<field type="char_buff" name="char_buff4"/>
+		<field type="char_buff" name="char_buff5"/>
+		<field type="char_buff" name="char_buff6"/>
+		<field type="char_buff" name="char_buff7"/>
+		<field type="char_buff" name="char_buff8"/>
+		<field type="char_buff" name="char_buff9"/>
+		<field type="char_buff" name="char_buff10"/>
+		<field type="char_buff" name="char_buff11"/>
+		<field type="char_buff" name="char_buff12"/>
+		<field type="char_buff" name="char_buff13"/>
+		<field type="char_buff" name="char_buff14"/>
+		<field type="char_buff" name="char_buff15"/>
+		<field type="char_buff" name="char_buff16"/>
+		<field type="char_buff" name="char_buff17"/>
+		<field type="char_buff" name="char_buff18"/>
+		<field type="char_buff" name="char_buff19"/>
+		<field type="char_buff" name="char_buff20"/>
+		<field type="char_buff" name="char_buff21"/>
+		<field type="char_buff" name="char_buff22"/>
+		<field type="char_buff" name="char_buff23"/>
+		<field type="char_buff" name="char_buff24"/>
+		<field type="char_buff" name="char_buff25"/>
+		<field type="char_buff" name="char_buff26"/>
+		<field type="char_buff" name="char_buff27"/>
+		<field type="char_buff" name="char_buff28"/>
+		<field type="char_buff" name="char_buff29"/>
+		<field type="char_buff" name="char_buff30"/>
+		<field type="char_buff" name="char_buff31"/>
+		<field type="char_buff" name="char_buff32"/>
+		<field type="char_buff" name="char_buff33"/>
+		<field type="char_buff" name="char_buff34"/>
+		<field type="char_buff" name="char_buff35"/>
+		<field type="char_buff" name="char_buff36"/>
+		<field type="char_buff" name="char_buff37"/>
+		<field type="char_buff" name="char_buff38"/>
+		<field type="char_buff" name="char_buff39"/>
+		<field type="char_buff" name="char_buff40"/>
+		<field type="char_buff" name="char_buff41"/>
+		<field type="char_buff" name="char_buff42"/>
+		<field type="char_buff" name="char_buff43"/>
+		<field type="char_buff" name="char_buff44"/>
+		<field type="char_buff" name="char_buff45"/>
+		<field type="char_buff" name="char_buff46"/>
+		<field type="char_buff" name="char_buff47"/>
+		<field type="char_buff" name="char_buff48"/>
+		<field type="char_buff" name="char_buff49"/>
+		<field type="char_buff" name="char_buff50"/>
+		<!-- new section: skills -->
+		<field type="u32" name="unknown9"/> <!-- @ 1197: maybe some count -->
+		<!-- this used for the skill panel ? -->
+		<!-- skip2[0]: 8 = pk status, 4 = disenchanting
+		     skip2[1] = 80000000 -> reifort, 40000000 -> logar
+		     skip2[2] = 1 -> valley of elves, 2 -> heffner camp, 4 -> black codex transport, 8 -> morfantas city
+		 -->
+		<field type="u32" name="skip2" count="501" />
+		<field type="u32" name="guildid" />
+		<field type="float" name="unknown9a" />
+		<field type="u32" name="skip3" count="900" />
+		<field type="u32" name="unknown10"/> <!-- always 499602d2 ? -->
+		<!-- new section: classes -->
+		<field type="char_class" name="class_gm"/>
+		<field type="char_class" name="class_warrior"/>
+		<field type="char_class" name="class_scout"/>
+		<field type="char_class" name="class_rogue"/>
+		<field type="char_class" name="class_mage"/>
+		<field type="char_class" name="class_priest"/>
+		<field type="char_class" name="class_knight"/>
+		<field type="char_class" name="class_warden"/>
+		<field type="char_class" name="class_druid"/>
+		<field type="char_class" name="class_warlock"/>
+		<field type="char_class" name="class_champion"/>
+		<!-- skip 5x char_class; these may be for future expansion -->
+		<field type="u8" name="char_unused" count="5300" display="1" />
+		<!-- 0x6930: new section: items -->
+		<field type="u32" name="unknown11"/> <!-- 50, 5a - levelcap maybe ? -->
+		<field type="u32" name="unknown12"/> <!-- not always zero, maybe count? -->
+		<field type="u32" name="unknown13"/> <!-- not always zero, maybe count? -->
+		<field type="u32" name="unknown14" count="8"/> <!-- padding? -->
+		<!-- 0x6930: items 0..49 are the item shop backpack -->
+		<field type="item_info" name="item0"/>
+		<field type="item_info" name="item1"/>
+		<field type="item_info" name="item2"/>
+		<field type="item_info" name="item3"/>
+		<field type="item_info" name="item4"/>
+		<field type="item_info" name="item5"/>
+		<field type="item_info" name="item6"/>
+		<field type="item_info" name="item7"/>
+		<field type="item_info" name="item8"/>
+		<field type="item_info" name="item9"/>
+		<field type="item_info" name="item10"/>
+		<field type="item_info" name="item11"/>
+		<field type="item_info" name="item12"/>
+		<field type="item_info" name="item13"/>
+		<field type="item_info" name="item14"/>
+		<field type="item_info" name="item15"/>
+		<field type="item_info" name="item16"/>
+		<field type="item_info" name="item17"/>
+		<field type="item_info" name="item18"/>
+		<field type="item_info" name="item19"/>
+		<field type="item_info" name="item20"/>
+		<field type="item_info" name="item21"/>
+		<field type="item_info" name="item22"/>
+		<field type="item_info" name="item23"/>
+		<field type="item_info" name="item24"/>
+		<field type="item_info" name="item25"/>
+		<field type="item_info" name="item26"/>
+		<field type="item_info" name="item27"/>
+		<field type="item_info" name="item28"/>
+		<field type="item_info" name="item29"/>
+		<field type="item_info" name="item30"/>
+		<field type="item_info" name="item31"/>
+		<field type="item_info" name="item32"/>
+		<field type="item_info" name="item33"/>
+		<field type="item_info" name="item34"/>
+		<field type="item_info" name="item35"/>
+		<field type="item_info" name="item36"/>
+		<field type="item_info" name="item37"/>
+		<field type="item_info" name="item38"/>
+		<field type="item_info" name="item39"/>
+		<field type="item_info" name="item40"/>
+		<field type="item_info" name="item41"/>
+		<field type="item_info" name="item42"/>
+		<field type="item_info" name="item43"/>
+		<field type="item_info" name="item44"/>
+		<field type="item_info" name="item45"/>
+		<field type="item_info" name="item46"/>
+		<field type="item_info" name="item47"/>
+		<field type="item_info" name="item48"/>
+		<field type="item_info" name="item49"/>
+		<!-- items 50 .. 54 are arcane transmutor -->
+		<field type="item_info" name="item50"/>
+		<field type="item_info" name="item51"/>
+		<field type="item_info" name="item52"/>
+		<field type="item_info" name="item53"/>
+		<field type="item_info" name="item54"/>
+		<!-- items 55...59 unused? -->
+		<field type="item_info" name="item55"/>
+		<field type="item_info" name="item56"/>
+		<field type="item_info" name="item57"/>
+		<field type="item_info" name="item58"/>
+		<field type="item_info" name="item59"/>
+		<!-- items 60..239 backpack - order is separately stored -->
+		<field type="item_info" name="item60"/>
+		<field type="item_info" name="item61"/>
+		<field type="item_info" name="item62"/>
+		<field type="item_info" name="item63"/>
+		<field type="item_info" name="item64"/>
+		<field type="item_info" name="item65"/>
+		<field type="item_info" name="item66"/>
+		<field type="item_info" name="item67"/>
+		<field type="item_info" name="item68"/>
+		<field type="item_info" name="item69"/>
+		<field type="item_info" name="item70"/>
+		<field type="item_info" name="item71"/>
+		<field type="item_info" name="item72"/>
+		<field type="item_info" name="item73"/>
+		<field type="item_info" name="item74"/>
+		<field type="item_info" name="item75"/>
+		<field type="item_info" name="item76"/>
+		<field type="item_info" name="item77"/>
+		<field type="item_info" name="item78"/>
+		<field type="item_info" name="item79"/>
+		<field type="item_info" name="item80"/>
+		<field type="item_info" name="item81"/>
+		<field type="item_info" name="item82"/>
+		<field type="item_info" name="item83"/>
+		<field type="item_info" name="item84"/>
+		<field type="item_info" name="item85"/>
+		<field type="item_info" name="item86"/>
+		<field type="item_info" name="item87"/>
+		<field type="item_info" name="item88"/>
+		<field type="item_info" name="item89"/>
+		<field type="item_info" name="item90"/>
+		<field type="item_info" name="item91"/>
+		<field type="item_info" name="item92"/>
+		<field type="item_info" name="item93"/>
+		<field type="item_info" name="item94"/>
+		<field type="item_info" name="item95"/>
+		<field type="item_info" name="item96"/>
+		<field type="item_info" name="item97"/>
+		<field type="item_info" name="item98"/>
+		<field type="item_info" name="item99"/>
+		<field type="item_info" name="item100"/>
+		<field type="item_info" name="item101"/>
+		<field type="item_info" name="item102"/>
+		<field type="item_info" name="item103"/>
+		<field type="item_info" name="item104"/>
+		<field type="item_info" name="item105"/>
+		<field type="item_info" name="item106"/>
+		<field type="item_info" name="item107"/>
+		<field type="item_info" name="item108"/>
+		<field type="item_info" name="item109"/>
+		<field type="item_info" name="item110"/>
+		<field type="item_info" name="item111"/>
+		<field type="item_info" name="item112"/>
+		<field type="item_info" name="item113"/>
+		<field type="item_info" name="item114"/>
+		<field type="item_info" name="item115"/>
+		<field type="item_info" name="item116"/>
+		<field type="item_info" name="item117"/>
+		<field type="item_info" name="item118"/>
+		<field type="item_info" name="item119"/>
+		<field type="item_info" name="item120"/>
+		<field type="item_info" name="item121"/>
+		<field type="item_info" name="item122"/>
+		<field type="item_info" name="item123"/>
+		<field type="item_info" name="item124"/>
+		<field type="item_info" name="item125"/>
+		<field type="item_info" name="item126"/>
+		<field type="item_info" name="item127"/>
+		<field type="item_info" name="item128"/>
+		<field type="item_info" name="item129"/>
+		<field type="item_info" name="item130"/>
+		<field type="item_info" name="item131"/>
+		<field type="item_info" name="item132"/>
+		<field type="item_info" name="item133"/>
+		<field type="item_info" name="item134"/>
+		<field type="item_info" name="item135"/>
+		<field type="item_info" name="item136"/>
+		<field type="item_info" name="item137"/>
+		<field type="item_info" name="item138"/>
+		<field type="item_info" name="item139"/>
+		<field type="item_info" name="item140"/>
+		<field type="item_info" name="item141"/>
+		<field type="item_info" name="item142"/>
+		<field type="item_info" name="item143"/>
+		<field type="item_info" name="item144"/>
+		<field type="item_info" name="item145"/>
+		<field type="item_info" name="item146"/>
+		<field type="item_info" name="item147"/>
+		<field type="item_info" name="item148"/>
+		<field type="item_info" name="item149"/>
+		<field type="item_info" name="item150"/>
+		<field type="item_info" name="item151"/>
+		<field type="item_info" name="item152"/>
+		<field type="item_info" name="item153"/>
+		<field type="item_info" name="item154"/>
+		<field type="item_info" name="item155"/>
+		<field type="item_info" name="item156"/>
+		<field type="item_info" name="item157"/>
+		<field type="item_info" name="item158"/>
+		<field type="item_info" name="item159"/>
+		<field type="item_info" name="item160"/>
+		<field type="item_info" name="item161"/>
+		<field type="item_info" name="item162"/>
+		<field type="item_info" name="item163"/>
+		<field type="item_info" name="item164"/>
+		<field type="item_info" name="item165"/>
+		<field type="item_info" name="item166"/>
+		<field type="item_info" name="item167"/>
+		<field type="item_info" name="item168"/>
+		<field type="item_info" name="item169"/>
+		<field type="item_info" name="item170"/>
+		<field type="item_info" name="item171"/>
+		<field type="item_info" name="item172"/>
+		<field type="item_info" name="item173"/>
+		<field type="item_info" name="item174"/>
+		<field type="item_info" name="item175"/>
+		<field type="item_info" name="item176"/>
+		<field type="item_info" name="item177"/>
+		<field type="item_info" name="item178"/>
+		<field type="item_info" name="item179"/>
+		<field type="item_info" name="item180"/>
+		<field type="item_info" name="item181"/>
+		<field type="item_info" name="item182"/>
+		<field type="item_info" name="item183"/>
+		<field type="item_info" name="item184"/>
+		<field type="item_info" name="item185"/>
+		<field type="item_info" name="item186"/>
+		<field type="item_info" name="item187"/>
+		<field type="item_info" name="item188"/>
+		<field type="item_info" name="item189"/>
+		<field type="item_info" name="item190"/>
+		<field type="item_info" name="item191"/>
+		<field type="item_info" name="item192"/>
+		<field type="item_info" name="item193"/>
+		<field type="item_info" name="item194"/>
+		<field type="item_info" name="item195"/>
+		<field type="item_info" name="item196"/>
+		<field type="item_info" name="item197"/>
+		<field type="item_info" name="item198"/>
+		<field type="item_info" name="item199"/>
+		<field type="item_info" name="item200"/>
+		<field type="item_info" name="item201"/>
+		<field type="item_info" name="item202"/>
+		<field type="item_info" name="item203"/>
+		<field type="item_info" name="item204"/>
+		<field type="item_info" name="item205"/>
+		<field type="item_info" name="item206"/>
+		<field type="item_info" name="item207"/>
+		<field type="item_info" name="item208"/>
+		<field type="item_info" name="item209"/>
+		<field type="item_info" name="item210"/>
+		<field type="item_info" name="item211"/>
+		<field type="item_info" name="item212"/>
+		<field type="item_info" name="item213"/>
+		<field type="item_info" name="item214"/>
+		<field type="item_info" name="item215"/>
+		<field type="item_info" name="item216"/>
+		<field type="item_info" name="item217"/>
+		<field type="item_info" name="item218"/>
+		<field type="item_info" name="item219"/>
+		<field type="item_info" name="item220"/>
+		<field type="item_info" name="item221"/>
+		<field type="item_info" name="item222"/>
+		<field type="item_info" name="item223"/>
+		<field type="item_info" name="item224"/>
+		<field type="item_info" name="item225"/>
+		<field type="item_info" name="item226"/>
+		<field type="item_info" name="item227"/>
+		<field type="item_info" name="item228"/>
+		<field type="item_info" name="item229"/>
+		<field type="item_info" name="item230"/>
+		<field type="item_info" name="item231"/>
+		<field type="item_info" name="item232"/>
+		<field type="item_info" name="item233"/>
+		<field type="item_info" name="item234"/>
+		<field type="item_info" name="item235"/>
+		<field type="item_info" name="item236"/>
+		<field type="item_info" name="item237"/>
+		<field type="item_info" name="item238"/>
+		<field type="item_info" name="item239"/>
+		<!-- a8f0: section: finance -->
+		<field type="u32" name="unknown15"/> <!-- always 15 ? -->
+		<field type="u32" name="gold" format="decimal"/>
+		<field type="u32" name="dia" format="decimal"/>
+		<!-- items 240..439 are bank box I-V items -->
+		<field type="item_info" name="item240"/>
+		<field type="item_info" name="item241"/>
+		<field type="item_info" name="item242"/>
+		<field type="item_info" name="item243"/>
+		<field type="item_info" name="item244"/>
+		<field type="item_info" name="item245"/>
+		<field type="item_info" name="item246"/>
+		<field type="item_info" name="item247"/>
+		<field type="item_info" name="item248"/>
+		<field type="item_info" name="item249"/>
+		<field type="item_info" name="item250"/>
+		<field type="item_info" name="item251"/>
+		<field type="item_info" name="item252"/>
+		<field type="item_info" name="item253"/>
+		<field type="item_info" name="item254"/>
+		<field type="item_info" name="item255"/>
+		<field type="item_info" name="item256"/>
+		<field type="item_info" name="item257"/>
+		<field type="item_info" name="item258"/>
+		<field type="item_info" name="item259"/>
+		<field type="item_info" name="item260"/>
+		<field type="item_info" name="item261"/>
+		<field type="item_info" name="item262"/>
+		<field type="item_info" name="item263"/>
+		<field type="item_info" name="item264"/>
+		<field type="item_info" name="item265"/>
+		<field type="item_info" name="item266"/>
+		<field type="item_info" name="item267"/>
+		<field type="item_info" name="item268"/>
+		<field type="item_info" name="item269"/>
+		<field type="item_info" name="item270"/>
+		<field type="item_info" name="item271"/>
+		<field type="item_info" name="item272"/>
+		<field type="item_info" name="item273"/>
+		<field type="item_info" name="item274"/>
+		<field type="item_info" name="item275"/>
+		<field type="item_info" name="item276"/>
+		<field type="item_info" name="item277"/>
+		<field type="item_info" name="item278"/>
+		<field type="item_info" name="item279"/>
+		<field type="item_info" name="item280"/>
+		<field type="item_info" name="item281"/>
+		<field type="item_info" name="item282"/>
+		<field type="item_info" name="item283"/>
+		<field type="item_info" name="item284"/>
+		<field type="item_info" name="item285"/>
+		<field type="item_info" name="item286"/>
+		<field type="item_info" name="item287"/>
+		<field type="item_info" name="item288"/>
+		<field type="item_info" name="item289"/>
+		<field type="item_info" name="item290"/>
+		<field type="item_info" name="item291"/>
+		<field type="item_info" name="item292"/>
+		<field type="item_info" name="item293"/>
+		<field type="item_info" name="item294"/>
+		<field type="item_info" name="item295"/>
+		<field type="item_info" name="item296"/>
+		<field type="item_info" name="item297"/>
+		<field type="item_info" name="item298"/>
+		<field type="item_info" name="item299"/>
+		<field type="item_info" name="item300"/>
+		<field type="item_info" name="item301"/>
+		<field type="item_info" name="item302"/>
+		<field type="item_info" name="item303"/>
+		<field type="item_info" name="item304"/>
+		<field type="item_info" name="item305"/>
+		<field type="item_info" name="item306"/>
+		<field type="item_info" name="item307"/>
+		<field type="item_info" name="item308"/>
+		<field type="item_info" name="item309"/>
+		<field type="item_info" name="item310"/>
+		<field type="item_info" name="item311"/>
+		<field type="item_info" name="item312"/>
+		<field type="item_info" name="item313"/>
+		<field type="item_info" name="item314"/>
+		<field type="item_info" name="item315"/>
+		<field type="item_info" name="item316"/>
+		<field type="item_info" name="item317"/>
+		<field type="item_info" name="item318"/>
+		<field type="item_info" name="item319"/>
+		<field type="item_info" name="item320"/>
+		<field type="item_info" name="item321"/>
+		<field type="item_info" name="item322"/>
+		<field type="item_info" name="item323"/>
+		<field type="item_info" name="item324"/>
+		<field type="item_info" name="item325"/>
+		<field type="item_info" name="item326"/>
+		<field type="item_info" name="item327"/>
+		<field type="item_info" name="item328"/>
+		<field type="item_info" name="item329"/>
+		<field type="item_info" name="item330"/>
+		<field type="item_info" name="item331"/>
+		<field type="item_info" name="item332"/>
+		<field type="item_info" name="item333"/>
+		<field type="item_info" name="item334"/>
+		<field type="item_info" name="item335"/>
+		<field type="item_info" name="item336"/>
+		<field type="item_info" name="item337"/>
+		<field type="item_info" name="item338"/>
+		<field type="item_info" name="item339"/>
+		<field type="item_info" name="item340"/>
+		<field type="item_info" name="item341"/>
+		<field type="item_info" name="item342"/>
+		<field type="item_info" name="item343"/>
+		<field type="item_info" name="item344"/>
+		<field type="item_info" name="item345"/>
+		<field type="item_info" name="item346"/>
+		<field type="item_info" name="item347"/>
+		<field type="item_info" name="item348"/>
+		<field type="item_info" name="item349"/>
+		<field type="item_info" name="item350"/>
+		<field type="item_info" name="item351"/>
+		<field type="item_info" name="item352"/>
+		<field type="item_info" name="item353"/>
+		<field type="item_info" name="item354"/>
+		<field type="item_info" name="item355"/>
+		<field type="item_info" name="item356"/>
+		<field type="item_info" name="item357"/>
+		<field type="item_info" name="item358"/>
+		<field type="item_info" name="item359"/>
+		<field type="item_info" name="item360"/>
+		<field type="item_info" name="item361"/>
+		<field type="item_info" name="item362"/>
+		<field type="item_info" name="item363"/>
+		<field type="item_info" name="item364"/>
+		<field type="item_info" name="item365"/>
+		<field type="item_info" name="item366"/>
+		<field type="item_info" name="item367"/>
+		<field type="item_info" name="item368"/>
+		<field type="item_info" name="item369"/>
+		<field type="item_info" name="item370"/>
+		<field type="item_info" name="item371"/>
+		<field type="item_info" name="item372"/>
+		<field type="item_info" name="item373"/>
+		<field type="item_info" name="item374"/>
+		<field type="item_info" name="item375"/>
+		<field type="item_info" name="item376"/>
+		<field type="item_info" name="item377"/>
+		<field type="item_info" name="item378"/>
+		<field type="item_info" name="item379"/>
+		<field type="item_info" name="item380"/>
+		<field type="item_info" name="item381"/>
+		<field type="item_info" name="item382"/>
+		<field type="item_info" name="item383"/>
+		<field type="item_info" name="item384"/>
+		<field type="item_info" name="item385"/>
+		<field type="item_info" name="item386"/>
+		<field type="item_info" name="item387"/>
+		<field type="item_info" name="item388"/>
+		<field type="item_info" name="item389"/>
+		<field type="item_info" name="item390"/>
+		<field type="item_info" name="item391"/>
+		<field type="item_info" name="item392"/>
+		<field type="item_info" name="item393"/>
+		<field type="item_info" name="item394"/>
+		<field type="item_info" name="item395"/>
+		<field type="item_info" name="item396"/>
+		<field type="item_info" name="item397"/>
+		<field type="item_info" name="item398"/>
+		<field type="item_info" name="item399"/>
+		<field type="item_info" name="item400"/>
+		<field type="item_info" name="item401"/>
+		<field type="item_info" name="item402"/>
+		<field type="item_info" name="item403"/>
+		<field type="item_info" name="item404"/>
+		<field type="item_info" name="item405"/>
+		<field type="item_info" name="item406"/>
+		<field type="item_info" name="item407"/>
+		<field type="item_info" name="item408"/>
+		<field type="item_info" name="item409"/>
+		<field type="item_info" name="item410"/>
+		<field type="item_info" name="item411"/>
+		<field type="item_info" name="item412"/>
+		<field type="item_info" name="item413"/>
+		<field type="item_info" name="item414"/>
+		<field type="item_info" name="item415"/>
+		<field type="item_info" name="item416"/>
+		<field type="item_info" name="item417"/>
+		<field type="item_info" name="item418"/>
+		<field type="item_info" name="item419"/>
+		<field type="item_info" name="item420"/>
+		<field type="item_info" name="item421"/>
+		<field type="item_info" name="item422"/>
+		<field type="item_info" name="item423"/>
+		<field type="item_info" name="item424"/>
+		<field type="item_info" name="item425"/>
+		<field type="item_info" name="item426"/>
+		<field type="item_info" name="item427"/>
+		<field type="item_info" name="item428"/>
+		<field type="item_info" name="item429"/>
+		<field type="item_info" name="item430"/>
+		<field type="item_info" name="item431"/>
+		<field type="item_info" name="item432"/>
+		<field type="item_info" name="item433"/>
+		<field type="item_info" name="item434"/>
+		<field type="item_info" name="item435"/>
+		<field type="item_info" name="item436"/>
+		<field type="item_info" name="item437"/>
+		<field type="item_info" name="item438"/>
+		<field type="item_info" name="item439"/>
+		<!-- 440..539 are item shop bank box items -->
+		<field type="item_info" name="item440"/>
+		<field type="item_info" name="item441"/>
+		<field type="item_info" name="item442"/>
+		<field type="item_info" name="item443"/>
+		<field type="item_info" name="item444"/>
+		<field type="item_info" name="item445"/>
+		<field type="item_info" name="item446"/>
+		<field type="item_info" name="item447"/>
+		<field type="item_info" name="item448"/>
+		<field type="item_info" name="item449"/>
+		<field type="item_info" name="item450"/>
+		<field type="item_info" name="item451"/>
+		<field type="item_info" name="item452"/>
+		<field type="item_info" name="item453"/>
+		<field type="item_info" name="item454"/>
+		<field type="item_info" name="item455"/>
+		<field type="item_info" name="item456"/>
+		<field type="item_info" name="item457"/>
+		<field type="item_info" name="item458"/>
+		<field type="item_info" name="item459"/>
+		<field type="item_info" name="item460"/>
+		<field type="item_info" name="item461"/>
+		<field type="item_info" name="item462"/>
+		<field type="item_info" name="item463"/>
+		<field type="item_info" name="item464"/>
+		<field type="item_info" name="item465"/>
+		<field type="item_info" name="item466"/>
+		<field type="item_info" name="item467"/>
+		<field type="item_info" name="item468"/>
+		<field type="item_info" name="item469"/>
+		<field type="item_info" name="item470"/>
+		<field type="item_info" name="item471"/>
+		<field type="item_info" name="item472"/>
+		<field type="item_info" name="item473"/>
+		<field type="item_info" name="item474"/>
+		<field type="item_info" name="item475"/>
+		<field type="item_info" name="item476"/>
+		<field type="item_info" name="item477"/>
+		<field type="item_info" name="item478"/>
+		<field type="item_info" name="item479"/>
+		<field type="item_info" name="item480"/>
+		<field type="item_info" name="item481"/>
+		<field type="item_info" name="item482"/>
+		<field type="item_info" name="item483"/>
+		<field type="item_info" name="item484"/>
+		<field type="item_info" name="item485"/>
+		<field type="item_info" name="item486"/>
+		<field type="item_info" name="item487"/>
+		<field type="item_info" name="item488"/>
+		<field type="item_info" name="item489"/>
+		<field type="item_info" name="item490"/>
+		<field type="item_info" name="item491"/>
+		<field type="item_info" name="item492"/>
+		<field type="item_info" name="item493"/>
+		<field type="item_info" name="item494"/>
+		<field type="item_info" name="item495"/>
+		<field type="item_info" name="item496"/>
+		<field type="item_info" name="item497"/>
+		<field type="item_info" name="item498"/>
+		<field type="item_info" name="item499"/>
+		<field type="item_info" name="item500"/>
+		<field type="item_info" name="item501"/>
+		<field type="item_info" name="item502"/>
+		<field type="item_info" name="item503"/>
+		<field type="item_info" name="item504"/>
+		<field type="item_info" name="item505"/>
+		<field type="item_info" name="item506"/>
+		<field type="item_info" name="item507"/>
+		<field type="item_info" name="item508"/>
+		<field type="item_info" name="item509"/>
+		<field type="item_info" name="item510"/>
+		<field type="item_info" name="item511"/>
+		<field type="item_info" name="item512"/>
+		<field type="item_info" name="item513"/>
+		<field type="item_info" name="item514"/>
+		<field type="item_info" name="item515"/>
+		<field type="item_info" name="item516"/>
+		<field type="item_info" name="item517"/>
+		<field type="item_info" name="item518"/>
+		<field type="item_info" name="item519"/>
+		<field type="item_info" name="item520"/>
+		<field type="item_info" name="item521"/>
+		<field type="item_info" name="item522"/>
+		<field type="item_info" name="item523"/>
+		<field type="item_info" name="item524"/>
+		<field type="item_info" name="item525"/>
+		<field type="item_info" name="item526"/>
+		<field type="item_info" name="item527"/>
+		<field type="item_info" name="item528"/>
+		<field type="item_info" name="item529"/>
+		<field type="item_info" name="item530"/>
+		<field type="item_info" name="item531"/>
+		<field type="item_info" name="item532"/>
+		<field type="item_info" name="item533"/>
+		<field type="item_info" name="item534"/>
+		<field type="item_info" name="item535"/>
+		<field type="item_info" name="item536"/>
+		<field type="item_info" name="item537"/>
+		<field type="item_info" name="item538"/>
+		<field type="item_info" name="item539"/>
+		<!-- section: house maid items -->
+		<field type="u32" name="unknown15a"/>
+		<field type="u32" name="unknown15b"/>
+		<field type="u32" name="unknown15c"/>
+		<field type="item_info" name="item540"/>
+		<field type="item_info" name="item541"/>
+		<field type="item_info" name="item542"/>
+		<field type="item_info" name="item543"/>
+		<field type="item_info" name="item544"/>
+		<field type="item_info" name="item545"/>
+		<field type="item_info" name="item546"/>
+		<field type="item_info" name="item547"/>
+		<field type="item_info" name="item548"/>
+		<field type="item_info" name="item549"/>
+		<field type="item_info" name="item550"/>
+		<field type="item_info" name="item551"/>
+		<field type="item_info" name="item552"/>
+		<field type="item_info" name="item553"/>
+		<field type="item_info" name="item554"/>
+		<field type="item_info" name="item555"/>
+		<field type="item_info" name="item556"/>
+		<field type="item_info" name="item557"/>
+		<field type="item_info" name="item558"/>
+		<field type="item_info" name="item559"/>
+		<field type="item_info" name="item560"/>
+		<field type="item_info" name="item561"/>
+		<field type="item_info" name="item562"/>
+		<field type="item_info" name="item563"/>
+		<field type="item_info" name="item564"/>
+		<field type="item_info" name="item565"/>
+		<field type="item_info" name="item566"/>
+		<field type="item_info" name="item567"/>
+		<field type="item_info" name="item568"/>
+		<field type="item_info" name="item569"/>
+		<field type="item_info" name="item570"/>
+		<field type="item_info" name="item571"/>
+		<field type="item_info" name="item572"/>
+		<field type="item_info" name="item573"/>
+		<field type="item_info" name="item574"/>
+		<field type="item_info" name="item575"/>
+		<field type="item_info" name="item576"/>
+		<field type="item_info" name="item577"/>
+		<field type="item_info" name="item578"/>
+		<field type="item_info" name="item579"/>
+		<field type="item_info" name="item580"/>
+		<field type="item_info" name="item581"/>
+		<field type="item_info" name="item582"/>
+		<field type="item_info" name="item583"/>
+		<!-- no idea what this is -->
+		<field type="u32" name="skip5" count="1130" /> <!-- all zero ? -->
+		<!-- offset 11610: wonder if this is quest state? -->
+		<field type="u32" name="skip7" count="136" />
+		<!-- offset 11830: inventory backpack order -->
+		<field type="u8" name="backpack_order" count="256" format="decimal" />
+		<!-- offset 11930: quest data -->
+		<field type="char_quest" name="quest1"/>
+		<field type="char_quest" name="quest2"/>
+		<field type="char_quest" name="quest3"/>
+		<field type="char_quest" name="quest4"/>
+		<field type="char_quest" name="quest5"/>
+		<field type="char_quest" name="quest6"/>
+		<field type="char_quest" name="quest7"/>
+		<field type="char_quest" name="quest8"/>
+		<field type="char_quest" name="quest9"/>
+		<field type="char_quest" name="quest10"/>
+		<field type="char_quest" name="quest11"/>
+		<field type="char_quest" name="quest12"/>
+		<field type="char_quest" name="quest13"/>
+		<field type="char_quest" name="quest14"/>
+		<field type="char_quest" name="quest15"/>
+		<field type="char_quest" name="quest16"/>
+		<field type="char_quest" name="quest17"/>
+		<field type="char_quest" name="quest18"/>
+		<field type="char_quest" name="quest19"/>
+		<field type="char_quest" name="quest20"/>
+		<field type="char_quest" name="quest21"/>
+		<field type="char_quest" name="quest22"/>
+		<field type="char_quest" name="quest23"/>
+		<field type="char_quest" name="quest24"/>
+		<field type="char_quest" name="quest25"/>
+		<field type="char_quest" name="quest26"/>
+		<field type="char_quest" name="quest27"/>
+		<field type="char_quest" name="quest28"/>
+		<field type="char_quest" name="quest29"/>
+		<field type="char_quest" name="quest30"/>
+		<!-- per-quest status is simply a bit in quests_completed, offset 420000
+		 or completed(q) = quests_completed[(q / 8) - 420000] & (1 << (q % 8))
+		-->
+		<field type="u8" name="quests_completed" count="1024" />
+		<!-- section: no idea -->
+		<field type="unixtime" name="unknown_timestamp"/> <!-- some timestamp -->
+		<!-- ? -->
+		<field type="u32" name="unknown15d"/>
+		<field type="u32" name="unknown15e"/>
+		<field type="u32" name="dailies_completed" format="decimal" />
+		<field type="u32" name="skip10" count="317" /> <!-- all 0 ? -->
+		<!-- offset 1239c: backpack status -->
+		<field type="u32" name="backpack_expire" count="4" />
+		<field type="u8" name="unknown16b" count="784" /> <!-- mostly 0xff -->
+		<field type="u32" name="unknown16c" count="1000" format="decimal"/>
+		<!-- offset 1365c: section: account info -->
+		<field type="u32" name="unknown17"/>
+		<field type="u32" name="unknown18"/>
+		<!-- 19+20 together may be a 64-bit time value -->
+		<field type="u32" name="unknown19"/>
+		<field type="u32" name="unknown20"/>
+		<field type="string" name="hash" length="32"/>
+		<field type="u32" name="unknown21"/> <!-- always 0? -->
+		<field type="u32" name="human_health"/> <!-- human health value, if this reaches 0 no rewards will be given -->
+		<field type="u32" name="unknown23" count="51"/>
+		<!-- offset 13760: section: transport book -->
+		<field type="char_transport" name="transport1"/>
+		<field type="char_transport" name="transport2"/>
+		<field type="char_transport" name="transport3"/>
+		<field type="char_transport" name="transport4"/>
+		<field type="char_transport" name="transport5"/>
+		<field type="char_transport" name="transport6"/>
+		<field type="char_transport" name="transport7"/>
+		<field type="char_transport" name="transport8"/>
+		<field type="char_transport" name="transport9"/>
+		<field type="char_transport" name="transport10"/>
+		<field type="char_transport" name="transport11"/>
+		<field type="char_transport" name="transport12"/>
+		<field type="char_transport" name="transport13"/>
+		<field type="char_transport" name="transport14"/>
+		<field type="char_transport" name="transport15"/>
+		<field type="char_transport" name="transport16"/>
+		<field type="char_transport" name="transport17"/>
+		<field type="char_transport" name="transport18"/>
+		<field type="char_transport" name="transport19"/>
+		<field type="char_transport" name="transport20"/>
+		<field type="char_transport" name="transport21"/>
+		<field type="char_transport" name="transport22"/>
+		<field type="char_transport" name="transport23"/>
+		<field type="char_transport" name="transport24"/>
+		<field type="char_transport" name="transport25"/>
+		<field type="char_transport" name="transport26"/>
+		<field type="char_transport" name="transport27"/>
+		<field type="char_transport" name="transport28"/>
+		<field type="char_transport" name="transport29"/>
+		<field type="char_transport" name="transport30"/>
+		<field type="char_transport" name="transport31"/>
+		<field type="char_transport" name="transport32"/>
+		<field type="char_transport" name="transport33"/>
+		<field type="char_transport" name="transport34"/>
+		<field type="char_transport" name="transport35"/>
+		<field type="char_transport" name="transport36"/>
+		<field type="char_transport" name="transport37"/>
+		<field type="char_transport" name="transport38"/>
+		<field type="char_transport" name="transport39"/>
+		<field type="char_transport" name="transport40"/>
+		<field type="char_transport" name="transport41"/>
+		<field type="char_transport" name="transport42"/>
+		<field type="char_transport" name="transport43"/>
+		<field type="char_transport" name="transport44"/>
+		<field type="char_transport" name="transport45"/>
+		<field type="char_transport" name="transport46"/>
+		<field type="char_transport" name="transport47"/>
+		<field type="char_transport" name="transport48"/>
+		<field type="char_transport" name="transport49"/>
+		<field type="char_transport" name="transport50"/>
+		<!-- section: no idea -->
+		<field type="u32" name="skip11a"/>
+		<field type="float" name="skip11b"/>
+		<field type="u32" name="max_classes" format="decimal"/>
+		<field type="u32" name="charges" format="decimal"/>
+		<field type="u32" name="skip11c"/>
+		<field type="u32" name="rubies" format="decimal"/>
+		<field type="u32" name="skip11d" count="344" />
+		<field type="float" name="unknown25" count="3"/>
+		<field type="u32" name="skip11e" count="35" />
+		<!-- offset 14dd8: pets; amount is a guess -->
+		<field type="char_pet" name="pet1"/>
+		<field type="char_pet" name="pet2"/>
+		<field type="char_pet" name="pet3"/>
+		<field type="char_pet" name="pet4"/>
+		<field type="char_pet" name="pet5"/>
+		<field type="char_pet" name="pet6"/>
+		<field type="u32" name="unknown26"/>
+		<!-- offset 1618c: unknown -->
+		<field type="u32" name="unknown27"/>
+		<field type="float" name="unknown27a"/>
+		<field type="u32" name="skip13" count="308" />
+		<!-- offset 16660: item set skills -->
+		<field type="u32" name="unknown28" format="decimal" />
+		<field type="u32" name="num_setskills" format="decimal"/>
+		<field type="u32" name="setskill1" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill2" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill3" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill4" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill5" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill6" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill7" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill8" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill9" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill10" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill11" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill12" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill13" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill14" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill15" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill16" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill17" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill18" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill19" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill20" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill21" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill22" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill23" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill24" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill25" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill26" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill27" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill28" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill29" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill30" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill31" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill32" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill33" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill34" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill35" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill36" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill37" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill38" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill39" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill40" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill41" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill42" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill43" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill44" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill45" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill46" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill47" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill48" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill49" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill50" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill51" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill52" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill53" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill54" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill55" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill56" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill57" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill58" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill59" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill60" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill61" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill62" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill63" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill64" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill65" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill66" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill67" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill68" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill69" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill70" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill71" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill72" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill73" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill74" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill75" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill76" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill77" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill78" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill79" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill80" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill81" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill82" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill83" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill84" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill85" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill86" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill87" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill88" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill89" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill90" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill91" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill92" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill93" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill94" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill95" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill96" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill97" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill98" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill99" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill100" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill101" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill102" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill103" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill104" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill105" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill106" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill107" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill108" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill109" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill110" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill111" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill112" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill113" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill114" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill115" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill116" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill117" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill118" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill119" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill120" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill121" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill122" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill123" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill124" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill125" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill126" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill127" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill128" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill129" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill130" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill131" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill132" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill133" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill134" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill135" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill136" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill137" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill138" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill139" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill140" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill141" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill142" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill143" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill144" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill145" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill146" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill147" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill148" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill149" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill150" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill151" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill152" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill153" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill154" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill155" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill156" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill157" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill158" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill159" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill160" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill161" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill162" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill163" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill164" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill165" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill166" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill167" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill168" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill169" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill170" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill171" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill172" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill173" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill174" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill175" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill176" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill177" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill178" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill179" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill180" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill181" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill182" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill183" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill184" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill185" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill186" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill187" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill188" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill189" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill190" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill191" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill192" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill193" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill194" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill195" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill196" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill197" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill198" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill199" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="setskill200" format="decimal" annotation="sys_name"/>
+		<!-- offset 1666c: equip set skills -->
+		<field type="u32" name="unknown29" /> <!-- always 3? -->
+		<field type="u32" name="equippedsetskill1"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill2"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill3"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill4"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill5"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill6"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill7"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill8"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill9"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill10"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill11"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill12"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill13"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill14"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill15"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill16"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill17"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill18"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill19"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill20"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill21"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill22"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill23"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill24"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill25"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill26"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill27"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill28"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill29"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill30"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill31"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill32"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill33"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill34"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill35"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill36"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill37"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill38"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill39"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill40"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill41"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill42"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill43"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill44"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill45"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill46"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill47"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill48"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill49"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill50"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill51"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill52"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill53"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill54"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill55"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill56"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill57"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill58"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill59"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="equippedsetskill60"  format="decimal" annotation="sys_name"/>
+		<field type="u32" name="unknown30" /> <!-- always 0? -->
+		<!-- offset 16a84: no idea; bunch of ffffffff's surrounded by 0's -->
+		<field type="u32" name="unknown31" /> <!-- ff ff ?? ff -->
+		<field type="u32" name="skip14" count="1395" />
+		<!-- offset 18054: no idea -->
+		<field type="u32" name="skip15" count="16" />
+		<!-- offset 18094: wealth -->
+		<field type="u32" name="unknown32"/>
+		<field type="u32" name="siege_badges" format="decimal"/>
+		<field type="u32" name="mementos" format="decimal"/>
+		<field type="u32" name="unknown33"/>
+		<field type="u32" name="shells" format="decimal"/>
+		<field type="u32" name="justice_energy" format="decimal"/>
+		<field type="u32" name="skip16" count="3" />
+		<!-- offset 180b8: used to be account info; UPDATE added a bunch of zero's here -->
+		<!-- UPDATE: <field type="u8" name="skip17" count="1248" display="1" /> -->
+		<field type="u32" name="charid" annotation="charid"/>
+		<field type="string" name="accountname" length="accountname_length"/>
+		<field type="string" name="date" length="24"/>
+		<field type="u32" name="unknown34" />
+		<field type="unixtime" name="last_online" /> <!-- unix timestamp -->
+		<field type="u32" name="unknown35" count="9" />
+		<!-- next is needed for updated verions as well -->
+		<!-- UPDATE: <field type="u8" name="skip18" count="96" display="1" /> -->
+	</struct>
+
+	<struct name="sw_battle">
+		<field type="u32" name="unknown1"/> <!-- 4 -->
+		<field type="u32" name="unknown2"/>
+		<field type="u32" name="guildpoints" format="decimal"/>
+		<field type="u8" name="unknown3"/>
+		<field type="u8" name="unknown4"/>
+		<field type="u8" name="unknown5"/>
+		<field type="u8" name="opponentworld" format="decimal"/>
+		<field type="u32" name="unknown6"/>
+		<field type="u32" name="unknown7"/>
+		<field type="string" name="guildname" length="32"/>
+		<field type="u32" name="unknown8"/> <!-- 4 -->
+		<field type="u32" name="unknown9"/>
+		<field type="u32" name="designatedwar" format="decimal"/>
+		<field type="u8" name="unknown10"/>
+		<field type="u8" name="unknown11"/>
+		<field type="u8" name="unknown12"/>
+		<field type="u8" name="guildworld" format="decimal"/>
+		<field type="u32" name="unknown13"/>
+		<field type="u32" name="unknown14"/>
+		<field type="string" name="opponentname" length="32"/>
+	</struct>
+
+	<struct name="relation">
+		<field type="u32" name="unknown1"/> <!-- always 0x1a26fc01 ? -->
+		<field type="u32" name="type" format="decimal" enumeration="relation_type"/>
+		<field type="u32" name="charid"/>
+		<field type="string" name="charname" length="charname_length"/>
+		<field type="float" name="unknown4"/>
+		<field type="u32" name="unknown5"/>
+		<field type="u32" name="class1" enumeration="class"/>
+		<field type="u32" name="class2" enumeration="class"/>
+		<field type="u32" name="unknown8"/>
+		<field type="u32" name="level1" format="decimal"/>
+		<field type="u32" name="level2" format="decimal"/>
+		<field type="u32" name="unknown12" format="decimal"/>
+		<field type="u32" name="titleid" format="decimal" annotation="sys_name"/>
+		<field type="u32" name="unknown14"/>
+		<field type="u32" name="category"/> <!-- 0 = special relation -->
+		<field type="u32" name="unknown16"/>
+		<field type="u32" name="unknown17"/>
+		<field type="u32" name="unknown18"/>
+		<field type="u32" name="unknown19"/>
+		<field type="u32" name="unknown20"/>
+	</struct>
+
+	<struct name="friend_info">
+		<field type="string" name="message" length="300"/>
+		<!-- 12c: relation info -->
+		<field type="relation" name="relation1"/>
+		<field type="relation" name="relation2"/>
+		<field type="relation" name="relation3"/>
+		<field type="relation" name="relation4"/>
+		<field type="relation" name="relation5"/>
+		<field type="relation" name="relation6"/>
+		<field type="relation" name="relation7"/>
+		<field type="relation" name="relation8"/>
+		<field type="relation" name="relation9"/>
+		<field type="relation" name="relation10"/>
+		<field type="relation" name="relation11"/>
+		<field type="relation" name="relation12"/>
+		<field type="relation" name="relation13"/>
+		<field type="relation" name="relation14"/>
+		<field type="relation" name="relation15"/>
+		<field type="relation" name="relation16"/>
+		<field type="relation" name="relation17"/>
+		<field type="relation" name="relation18"/>
+		<field type="relation" name="relation19"/>
+		<field type="relation" name="relation20"/>
+		<!-- 99c: friends -->
+    <field type="relation" name="friend1"/>
+    <field type="relation" name="friend2"/>
+    <field type="relation" name="friend3"/>
+    <field type="relation" name="friend4"/>
+    <field type="relation" name="friend5"/>
+    <field type="relation" name="friend6"/>
+    <field type="relation" name="friend7"/>
+    <field type="relation" name="friend8"/>
+    <field type="relation" name="friend9"/>
+    <field type="relation" name="friend10"/>
+    <field type="relation" name="friend11"/>
+    <field type="relation" name="friend12"/>
+    <field type="relation" name="friend13"/>
+    <field type="relation" name="friend14"/>
+    <field type="relation" name="friend15"/>
+    <field type="relation" name="friend16"/>
+    <field type="relation" name="friend17"/>
+    <field type="relation" name="friend18"/>
+    <field type="relation" name="friend19"/>
+    <field type="relation" name="friend20"/>
+    <field type="relation" name="friend21"/>
+    <field type="relation" name="friend22"/>
+    <field type="relation" name="friend23"/>
+    <field type="relation" name="friend24"/>
+    <field type="relation" name="friend25"/>
+    <field type="relation" name="friend26"/>
+    <field type="relation" name="friend27"/>
+    <field type="relation" name="friend28"/>
+    <field type="relation" name="friend29"/>
+    <field type="relation" name="friend30"/>
+    <field type="relation" name="friend31"/>
+    <field type="relation" name="friend32"/>
+    <field type="relation" name="friend33"/>
+    <field type="relation" name="friend34"/>
+    <field type="relation" name="friend35"/>
+    <field type="relation" name="friend36"/>
+    <field type="relation" name="friend37"/>
+    <field type="relation" name="friend38"/>
+    <field type="relation" name="friend39"/>
+    <field type="relation" name="friend40"/>
+    <field type="relation" name="friend41"/>
+    <field type="relation" name="friend42"/>
+    <field type="relation" name="friend43"/>
+    <field type="relation" name="friend44"/>
+    <field type="relation" name="friend45"/>
+    <field type="relation" name="friend46"/>
+    <field type="relation" name="friend47"/>
+    <field type="relation" name="friend48"/>
+    <field type="relation" name="friend49"/>
+    <field type="relation" name="friend50"/>
+    <field type="relation" name="friend51"/>
+    <field type="relation" name="friend52"/>
+    <field type="relation" name="friend53"/>
+    <field type="relation" name="friend54"/>
+    <field type="relation" name="friend55"/>
+    <field type="relation" name="friend56"/>
+    <field type="relation" name="friend57"/>
+    <field type="relation" name="friend58"/>
+    <field type="relation" name="friend59"/>
+    <field type="relation" name="friend60"/>
+    <field type="relation" name="friend61"/>
+    <field type="relation" name="friend62"/>
+    <field type="relation" name="friend63"/>
+    <field type="relation" name="friend64"/>
+    <field type="relation" name="friend65"/>
+    <field type="relation" name="friend66"/>
+    <field type="relation" name="friend67"/>
+    <field type="relation" name="friend68"/>
+    <field type="relation" name="friend69"/>
+    <field type="relation" name="friend70"/>
+    <field type="relation" name="friend71"/>
+    <field type="relation" name="friend72"/>
+    <field type="relation" name="friend73"/>
+    <field type="relation" name="friend74"/>
+    <field type="relation" name="friend75"/>
+    <field type="relation" name="friend76"/>
+    <field type="relation" name="friend77"/>
+    <field type="relation" name="friend78"/>
+    <field type="relation" name="friend79"/>
+    <field type="relation" name="friend80"/>
+    <field type="relation" name="friend81"/>
+    <field type="relation" name="friend82"/>
+    <field type="relation" name="friend83"/>
+    <field type="relation" name="friend84"/>
+    <field type="relation" name="friend85"/>
+    <field type="relation" name="friend86"/>
+    <field type="relation" name="friend87"/>
+    <field type="relation" name="friend88"/>
+    <field type="relation" name="friend89"/>
+    <field type="relation" name="friend90"/>
+    <field type="relation" name="friend91"/>
+    <field type="relation" name="friend92"/>
+    <field type="relation" name="friend93"/>
+    <field type="relation" name="friend94"/>
+    <field type="relation" name="friend95"/>
+    <field type="relation" name="friend96"/>
+    <field type="relation" name="friend97"/>
+    <field type="relation" name="friend98"/>
+    <field type="relation" name="friend99"/>
+    <field type="relation" name="friend100"/>
+    <field type="relation" name="friend101"/>
+    <field type="relation" name="friend102"/>
+    <field type="relation" name="friend103"/>
+    <field type="relation" name="friend104"/>
+    <field type="relation" name="friend105"/>
+    <field type="relation" name="friend106"/>
+    <field type="relation" name="friend107"/>
+    <field type="relation" name="friend108"/>
+    <field type="relation" name="friend109"/>
+    <field type="relation" name="friend110"/>
+    <field type="relation" name="friend111"/>
+    <field type="relation" name="friend112"/>
+    <field type="relation" name="friend113"/>
+    <field type="relation" name="friend114"/>
+    <field type="relation" name="friend115"/>
+    <field type="relation" name="friend116"/>
+    <field type="relation" name="friend117"/>
+    <field type="relation" name="friend118"/>
+    <field type="relation" name="friend119"/>
+    <field type="relation" name="friend120"/>
+    <field type="relation" name="friend121"/>
+    <field type="relation" name="friend122"/>
+    <field type="relation" name="friend123"/>
+    <field type="relation" name="friend124"/>
+    <field type="relation" name="friend125"/>
+    <field type="relation" name="friend126"/>
+    <field type="relation" name="friend127"/>
+    <field type="relation" name="friend128"/>
+    <field type="relation" name="friend129"/>
+    <field type="relation" name="friend130"/>
+    <field type="relation" name="friend131"/>
+    <field type="relation" name="friend132"/>
+    <field type="relation" name="friend133"/>
+    <field type="relation" name="friend134"/>
+    <field type="relation" name="friend135"/>
+    <field type="relation" name="friend136"/>
+    <field type="relation" name="friend137"/>
+    <field type="relation" name="friend138"/>
+    <field type="relation" name="friend139"/>
+    <field type="relation" name="friend140"/>
+    <field type="relation" name="friend141"/>
+    <field type="relation" name="friend142"/>
+    <field type="relation" name="friend143"/>
+    <field type="relation" name="friend144"/>
+    <field type="relation" name="friend145"/>
+    <field type="relation" name="friend146"/>
+    <field type="relation" name="friend147"/>
+    <field type="relation" name="friend148"/>
+    <field type="relation" name="friend149"/>
+    <field type="relation" name="friend150"/>
+    <field type="relation" name="friend151"/>
+    <field type="relation" name="friend152"/>
+    <field type="relation" name="friend153"/>
+    <field type="relation" name="friend154"/>
+    <field type="relation" name="friend155"/>
+    <field type="relation" name="friend156"/>
+    <field type="relation" name="friend157"/>
+    <field type="relation" name="friend158"/>
+    <field type="relation" name="friend159"/>
+    <field type="relation" name="friend160"/>
+    <field type="relation" name="friend161"/>
+    <field type="relation" name="friend162"/>
+    <field type="relation" name="friend163"/>
+    <field type="relation" name="friend164"/>
+		<!-- 4ecc: ? -->
+		<field type="u32" name="unknown1" count="22" />
+		<!-- 4f24: categories -->
+		<field type="string" name="category1" length="32"/>
+		<field type="string" name="category2" length="32"/>
+		<field type="string" name="category3" length="32"/>
+		<field type="string" name="category4" length="32"/>
+		<field type="string" name="category5" length="32"/>
+		<field type="string" name="category6" length="32"/>
+		<field type="string" name="category7" length="32"/>
+		<field type="string" name="category8" length="32"/>
+		<field type="string" name="category9" length="32"/>
+		<field type="string" name="category10" length="32"/>
+		<!-- 5064: order? -->
+		<field type="u32" name="unknown2" />
+		<field type="u32" name="unknown3" />
+		<field type="u32" name="unknown4" />
+	</struct>
+
+	<struct name="activity_cost">
+    <field type="string" name="activity" length="32"/>
+		<!--
+			for things on a timer (inventory space, bank boxes etc),
+			unknown1 is the amount in seconds and unknown2 is the cost
+			in diamonds - otherwise, unknown1 is the cost and everything
+			else is empty
+		 -->
+		<field type="u32" name="unknown1" format="decimal"/>
+		<field type="u32" name="unknown2" format="decimal"/>
+		<field type="u32" name="unknown3" format="decimal"/>
+		<field type="u32" name="unknown4" format="decimal"/>
+	</struct>
+
+	<struct name="guild_item">
+		<field type="u32" name="guildid"/>
+		<field type="u32" name="unknown1" format="decimal"/>
+		<field type="u32" name="page" format="decimal"/>
+		<field type="u32" name="position" format="decimal"/>
+		<field type="u32" name="unknown4" format="decimal"/>
+		<field type="item_info" name="item"/>
+	</struct>
+
+	<!--
+	  Login packets
+	  -->
+	<packet name="Login" source="client">
+		<field type="u32" name="type" fixed_value="0x02"/>
+		<field type="string" name="accountname" length="accountname_length"/>
+		<field type="string" name="password" length="password_length"/>
+		<field type="u32" name="unknown"/>
+	</packet>
+
+	<!-- Provided by luxtau@gmail.com -->
+	<packet name="ServerInfo" source="server">
+		<field type="u32" name="type" fixed_value="0x03"/>
+		<field type="u32" name="count"/> <!-- total server count -->
+		<field type="u32" name="serverid"/>
+		<field type="string" name="name" length="64"/>
+		<field type="string" name="address" length="64"/>
+		<field type="u32" name="port" format="decimal"/>
+		<field type="u32" name="channel_count"/>
+		<field type="float" name="channel_load" count="100" display="3" />
+		<field type="u32" name="update_time"/>
+		<field type="u32" name="world"/>
+		<field type="u32" name="last"/> <!-- ? -->
+		<field type="string" name="accountname" length="accountname_length"/>
+		<field type="u32" name="clientip"/>
+		<field type="u8" name="country" count="4"/>
+		<field type="u32" name="status" enumeration="server_status"/>
+		<field type="u32" name="maintenance"/>
+		<field type="u32" name="age"/>
+		<field type="u32" name="validtime"/>
+		<field type="u32" name="time"/>
+		<field type="unixtime" name="unknown_time"/>
+	</packet>
+
+	<packet name="LoginFailure" source="server">
+		<field type="u32" name="type" fixed_value="0x04"/>
+		<field type="u32" name="error" enumeration="loginfailure_error"/>
+	</packet>
+
+	<packet name="ServerList" source="server">
+		<field type="u32" name="type" fixed_value="0x06"/>
+		<field type="u8" name="num_chars" count="32"/>
+		<field type="length" name="ini_length" />
+		<field type="string" name="ini_data" min_length="1" length="65536"/> <!-- eat what's left of the packet -->
+</packet>
+
+	<packet name="ClientInfo" source="client">
+		<field type="u32" name="type" fixed_value="0x0d"/>
+		<field type="string" name="accountname" length="accountname_length"/>
+		<field type="string" name="clientid" length="clientid_length"/>
+		<field type="u32" name="gpu_pci_vendor"/>
+		<field type="u32" name="gpu_pci_device"/>
+		<field type="string" name="clientos" length="256"/>
+	</packet>
+
+	<!--
+	  Portal packets
+	  -->
+	<packet name="Token" source="server">
+		<field type="u32" name="type" fixed_value="0x76"/>
+		<field type="u32" name="token"/>
+	</packet>
+
+	<packet name="LoginToken" source="client">
+		<field type="u32" name="type" fixed_value="0x77"/>
+		<field type="u32" name="token"/>
+		<field type="string" name="accountname" length="accountname_length"/>
+		<field type="string" name="password" length="password_length"/>
+		<field type="string" name="clientid" length="clientid_length"/>
+		<field type="u32" name="unknown"/>
+	</packet>
+
+	<packet name="Redirect" source="server">
+		<field type="u32" name="type" fixed_value="0x78"/>
+		<field type="u32" name="unk1" fixed_value="0"/>
+		<field type="u32" name="target" fixed_value="0xc" enumeration="targets"/> <!-- server identifier -->
+		<field type="string" name="address" length="32"/>
+		<field type="u32" name="port" format="decimal"/>
+		<field type="u32" name="redirect_token"/>
+		<field type="u8" name="unk3" count="80"/> <!-- always 'NULL\0' -->
+	</packet>
+
+	<!--
+	  Game packets
+	  -->
+	<packet name="WantToken" source="server">
+		<field type="u32" name="type" fixed_value="0x79"/>
+	</packet>
+
+	<packet name="TokenLogin" source="client">
+		<field type="u32" name="type" fixed_value="0x7a"/>
+		<field type="u32" name="token"/>
+	</packet>
+
+	<packet name="SpecifyTarget" source="server">
+		<field type="u32" name="type" fixed_value="0x7f"/>
+		<field type="u32" name="target" enumeration="targets"/>
+		<field type="string" name="name" length="32"/>
+	</packet>
+
+	<packet name="CloseTarget" source="server">
+		<field type="u32" name="type" fixed_value="0x81"/>
+		<field type="u32" name="target"/>
+	</packet>
+
+	<!--
+	  Client to server packets
+	  -->
+	<packet name="ClientRequest" source="client">
+		<field type="u32" name="type" fixed_value="0x82"/>
+		<field type="u16" name="target" enumeration="targets"/>
+		<field type="u16" name="unknown" fixed_value="0xffff"/>
+		<field type="length" name="length" />
+
+		<subpacket name="PlayerMove">
+			<field type="u32" name="type" fixed_value="0x18"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="float" name="angle"/>
+			<field type="u32" name="move_type" enumeration="move_type"/>
+			<field type="float" name="dist_x"/>
+			<field type="float" name="dist_y"/>
+			<field type="float" name="dist_z"/>
+			<field type="u32" name="unknown1"/> <!-- always zero -->
+		</subpacket> 
+
+		<!--
+			this appears to send the client's idea of certain flags;
+		 -->
+		<subpacket name="unknown1f">
+			<field type="u32" name="type" fixed_value="0x1f"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket> 
+
+		<!-- no idea what this is; perhaps has to do with movement -->
+		<subpacket name="unknown22">
+			<field type="u32" name="type" fixed_value="0x22"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="x" />
+			<field type="float" name="y" />
+			<field type="float" name="z" />
+			<field type="float" name="angle" />
+			<field type="float" name="unknown6" />
+			<field type="u32" name="unknown7" />
+			<field type="float" name="unknown8" />
+		</subpacket>
+
+		<!-- reply is likely ReplyTickCount - used for lag calculation perhaps? -->
+		<subpacket name="SendTickCount">
+			<field type="u32" name="type" fixed_value="0x2a"/>
+			<field type="u32" name="tickcount" format="decimal" />
+		</subpacket>
+
+		<!-- some kind of ready? acknowledge is unknown39 -->
+		<subpacket name="unknown2d">
+			<field type="u32" name="type" fixed_value="0x2d"/>
+		</subpacket>
+
+		<subpacket name="UseItem">
+			<field type="u32" name="type" fixed_value="0x177"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="item_info" name="item"/>
+			<field type="u16" name="unknown3"/>
+			<field type="u16" name="unknown4"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+			<field type="u32" name="unknown7"/>
+		</subpacket> 
+
+		<!-- sent when SelectZone has been received/processed -->
+		<subpacket name="ZoneACK">
+			<field type="u32" name="type" fixed_value="0x82"/>
+			<field type="u32" name="zoneid" format="decimal" />
+		</subpacket>
+
+		<subpacket name="RequestSay">
+			<field type="u32" name="type" fixed_value="0x97"/>
+			<field type="u32" name="unknown1" count="21"/>
+			<field type="u32" name="length"/>
+			<field type="string" name="message" length="512"/>
+		</subpacket> 
+
+		<subpacket name="RequestPartyChat">
+			<field type="u32" name="type" fixed_value="0x9c"/>
+			<field type="u32" name="unknown1" count="4"/>
+			<field type="string" name="charname" length="64"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="length"/>
+			<field type="string" name="message" length="512"/>
+		</subpacket> 
+
+		<!-- response is 0xda -->
+		<subpacket name="SelectChar">
+			<field type="u32" name="type" fixed_value="0xd7"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="string" name="accountname" length="accountname_length"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<!-- reply to RequestAccountName, followed by e0? -->
+		<subpacket name="ReplyAccountName">
+			<field type="u32" name="type" fixed_value="0xdf"/>
+			<field type="string" name="accountname" length="accountname_length"/>
+			<field type="u32" name="redirect_token" />
+		</subpacket>
+
+		<!-- used when logging in, only if WantSecondaryPassword is sent -->
+		<subpacket name="SecondaryPassword">
+			<field type="u32" name="type" fixed_value="0xfb"/>
+			<field type="string" name="hash" length="32"/>
+			<field type="u32" name="unknown" />
+		</subpacket>
+
+		<!-- maybe to request stacking of an item? -->
+		<subpacket name="unknown166">
+			<field type="u32" name="type" fixed_value="0x166"/>
+			<field type="item_info" name="item"/>
+			<field type="u16" name="position" format="decimal"/>
+			<field type="u16" name="quantity" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="RequestItemSwap">
+			<field type="u32" name="type" fixed_value="0x169"/>
+			<field type="item_info" name="item1"/>
+			<field type="item_info" name="item2"/>
+			<field type="u16" name="unknown1"/>
+			<field type="u16" name="unknown2"/>
+			<field type="u16" name="position1" format="decimal"/>
+			<field type="u16" name="position2" format="decimal"/>
+			<field type="u32" name="unknown3"/>
+		</subpacket>
+
+		<subpacket name="RequestBasicAttack">
+			<field type="u32" name="type" fixed_value="0x1a4"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="RequestResurrect">
+			<field type="u32" name="type" fixed_value="0x1a8"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="RequestPlayerTitle">
+			<field type="u32" name="type" fixed_value="0x1ca"/>
+			<field type="u32" name="titleid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="RequestClassChange">
+			<field type="u32" name="type" fixed_value="0x1cf"/>
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+		</subpacket>
+
+		<subpacket name="RequestChangeChar">
+			<field type="u32" name="type" fixed_value="0x1d2"/>
+		</subpacket>
+
+		<!-- also sent whenever CharInfo's fields do not contain sensible data -->
+		<subpacket name="SetBackpackOrder">
+			<field type="u32" name="type" fixed_value="0x1df"/>
+			<!-- first order is for item61 -->
+			<field type="u8" name="order" count="256"/>
+		</subpacket>
+
+		<subpacket name="RequestQuestAccept">
+			<field type="u32" name="type" fixed_value="0x226"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="questid" format="decimal" annotation="sys_name"/>
+		</subpacket>
+
+		<subpacket name="HandQuestIn">
+			<field type="u32" name="type" fixed_value="0x227"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="questid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="unknown22a">
+			<field type="u32" name="type" fixed_value="0x22a"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<!-- quest related it seems; maybe update question mark? response is unknown236/unknown23b -->
+		<subpacket name="unknown235">
+			<field type="u32" name="type" fixed_value="0x235"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<!-- reply to pick a choice presented in DialogBox -->
+		<subpacket name="DialogueBoxChoice">
+			<field type="u32" name="type" fixed_value="0x237"/>
+			<field type="u32" name="choice" format="decimal"/>
+		</subpacket>
+
+		<!-- quest related it seems -->
+		<subpacket name="unknown23b">
+			<field type="u32" name="type" fixed_value="0x23b"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="RequestUseSkillTargetted">
+			<field type="u32" name="type" fixed_value="0x258"/>
+			<field type="u32" name="objectid1" annotation="objectid"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="objectid2" annotation="objectid"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="RequestUpgradeSkillTarget">
+			<field type="u32" name="type" fixed_value="0x261"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="rank" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="RequestUseSkillNontargetted">
+			<field type="u32" name="type" fixed_value="0x263"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+		</subpacket>
+
+		<subpacket name="RequestPartyInvite">
+			<field type="u32" name="type" fixed_value="0x320"/>
+		  <field type="string" name="charname" length="64"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket>
+
+		<subpacket name="AcceptPartyInvite">
+			<field type="u32" name="type" fixed_value="0x322"/>
+		  <field type="string" name="charname" length="64"/>
+		</subpacket>
+
+		<subpacket name="RequestPartyLeave">
+			<field type="u32" name="type" fixed_value="0x32a"/>
+		  <field type="string" name="charname" length="64"/>
+			<field type="u32" name="partyid"/>
+		</subpacket>
+
+		<subpacket name="RequestInspectObjectGear">
+			<field type="u32" name="type" fixed_value="0x346"/>
+			<field type="u32" name="objectid"/>
+		</subpacket>
+
+		<!-- response seems to be unknown35c -->
+		<subpacket name="unknown35b">
+			<field type="u32" name="type" fixed_value="0x35b"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="itemid" annotation="sys_name"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+		</subpacket>
+
+		<!--
+			 response seems to be unknown361
+			 I wonder if this is some kind of 'tunnel' packet; unknown1 seems to be
+			 a command, I've only seen 0x258 and 0xc8 there
+		  -->
+		<subpacket name="unknown360">
+			<field type="u32" name="type" fixed_value="0x360"/>
+			<field type="u32" name="unknown1"/> <!-- think this is the command -->
+			<field type="u32" name="unknown2"/> <!-- always 0xc, masterserver? -->
+			<field type="u32" name="unknown3"/> <!-- always 0x15f -->
+			<field type="u32" name="objectid1" annotation="objectid"/> 
+			<field type="u32" name="objectid2" annotation="objectid"/>
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="unknown5" />
+			<field type="u32" name="unknown6" />
+			<field type="u32" name="unknown7" />
+			<field type="u32" name="unknown8" />
+			<field type="u32" name="unknown9" />
+			<field type="u32" name="unknown10" />
+			<field type="u32" name="unknown11" />
+			<field type="u32" name="unknown12" />
+			<field type="u32" name="unknown13" />
+			<field type="u32" name="unknown14" />
+			<field type="u32" name="unknown15" />
+			<field type="u32" name="unknown16" />
+			<field type="u32" name="unknown17" />
+			<field type="u32" name="unknown18" />
+			<field type="u32" name="unknown19" />
+			<field type="u32" name="unknown20" />
+			<field type="u32" name="unknown22" />
+			<field type="u32" name="objectid3" annotation="objectid"/>
+			<field type="u32" name="unknown23" />
+			<field type="u32" name="unknown24" />
+			<field type="u32" name="unknown25" />
+			<field type="u32" name="target" enumeration="targets"/>
+			<field type="u32" name="unknown27" />
+			<field type="u32" name="unknown28" />
+			<field type="u32" name="unknown29" />
+			<field type="u32" name="unknown30" />
+			<field type="u32" name="unknown31" />
+			<field type="u32" name="unknown32" />
+		</subpacket>
+
+		<!-- response seems to be unknown365; maybe when another player takes an action? -->
+		<subpacket name="unknown364">
+			<field type="u32" name="type" fixed_value="0x364"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="RequestRecall">
+			<field type="u32" name="type" fixed_value="0x366"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket>
+
+		<subpacket name="unknown36e">
+			<field type="u32" name="type" fixed_value="0x36e"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<!-- used when using the item shop -->
+		<subpacket name="SecondaryPassword2">
+			<field type="u32" name="type" fixed_value="0x374"/>
+			<field type="string" name="password" length="32"/>
+		</subpacket>
+
+		<subpacket name="TargetObject">
+			<field type="u32" name="type" fixed_value="0x389"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="ParameterRequest">
+			<field type="u32" name="type" fixed_value="0x3a5"/>
+			<field type="u32" name="num" enumeration="parameters"/>
+		</subpacket>
+		
+		<subpacket name="SendInterface">
+			<field type="u32" name="type" fixed_value="0x3a8"/>
+			<field type="u32" name="subtype" /> <!-- 3 = macro, 4 = windows -->
+			<field type="u32" name="unknown1" /> <!-- 0 -->
+			<field type="u32" name="packed_length" />
+			<!-- the next (packed_length - 8) bytes are rompacked and are followed by
+			     another structure -->
+			<field type="u8" name="unknown" min_count="0" count="65536" display="1" />
+		</subpacket>
+
+		<subpacket name="unknown3b5">
+			<field type="u32" name="type" fixed_value="0x3b5"/>
+		  <field type="string" name="clientid" length="64"/>
+			<field type="float" name="unknown1"/>
+		</subpacket>
+
+		<!-- reply seems to be 3db -->
+		<subpacket name="unknown3da">
+			<field type="u32" name="type" fixed_value="0x3da"/>
+			<field type="u32" name="unknown1"/>
+			<field type="float" name="unknown2"/>
+			<field type="float" name="unknown3"/>
+			<field type="float" name="unknown4"/>
+			<field type="float" name="unknown5"/>
+		</subpacket>
+
+		<subpacket name="unknown3e0">
+			<field type="u32" name="type" fixed_value="0x3e0"/>
+			<field type="u32" name="unknown1" /> <!-- always 4? -->
+		</subpacket>
+
+		<subpacket name="RequestSendMail">
+		  <field type="u32" name="type" fixed_value="0x3e8"/>
+			<field type="item_info" name="item"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="skip1" count="152"/>
+			<field type="u32" name="gold" format="decimal"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+			<field type="u32" name="unknown7"/>
+			<field type="string" name="sender" length="charname_length"/>
+			<field type="string" name="recipient" length="charname_length"/>
+			<field type="string" name="subject" length="32"/>
+			<field type="u32" name="unknown8"/>
+			<field type="u32" name="unknown9"/>
+			<field type="u32" name="unknown10"/>
+			<field type="u32" name="unknown11" count="9"/>
+			<field type="float" name="unknown12"/>
+			<field type="u32" name="unknown13"/>
+			<field type="u32" name="unknown14"/>
+			<field type="u32" name="unknown15"/>
+			<field type="u32" name="unknown16"/>
+			<field type="u32" name="unknown17"/>
+			<field type="u32" name="unknown18"/>
+			<field type="u32" name="unknown19"/>
+			<field type="u32" name="unknown20"/>
+			<field type="u32" name="length" format="decimal"/>
+			<field type="string" name="body" min_length="1" length="1024" />
+		</subpacket>
+
+		<!--
+			 picks an item in the shopping window, it seems; answered by
+			 unknown519
+			-->
+		<subpacket name="unknown518">
+			<field type="u32" name="type" fixed_value="0x518"/>
+			<field type="u32" name="itemid" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="unknown592">
+			<field type="u32" name="type" fixed_value="0x592"/>
+			<field type="u32" name="guildid"/>
+		</subpacket>
+
+		<subpacket name="RequestGuildInfo">
+			<field type="u32" name="type" fixed_value="0x594"/>
+			<field type="u32" name="guildid"/>
+		</subpacket>
+
+		<subpacket name="GuildInviteReply">
+			<field type="u32" name="type" fixed_value="0x59f"/>
+			<field type="u32" name="charid"/>
+			<field type="u32" name="guildid"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<!-- seems to be sent as part of login - reply is unknown603 -->
+		<subpacket name="unknown601">
+			<field type="u32" name="type" fixed_value="0x601"/>
+		</subpacket>
+
+		<!-- only need this to ask housemaid to leave house -->
+		<subpacket name="LeaveHouse">
+			<field type="u32" name="type" fixed_value="0x857"/>
+			<field type="u32" name="charid" annotation="charid"/>
+		</subpacket>
+
+		<!-- this is guesswork; the item ID doesn't match up -->
+		<subpacket name="BuyItem">
+			<field type="u32" name="type" fixed_value="0x8a0"/>
+			<field type="u32" name="unknown1" format="decimal"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="string" name="password" length="32"/>
+		</subpacket>
+
+		<subpacket name="unknown92f">
+			<field type="u32" name="type" fixed_value="0x92f"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<!-- I think this is inspect loot of corpse -->
+		<subpacket name="unknown932">
+			<field type="u32" name="type" fixed_value="0x932"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="unknown934">
+			<field type="u32" name="type" fixed_value="0x934"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<!-- sent when the loading screen is at 100% -->
+		<subpacket name="ClientReady">
+			<field type="u32" name="type" fixed_value="0x982"/>
+			<field type="u32" name="charid" annotation="charid"/>
+		</subpacket>
+
+		<subpacket name="RequestItemFromVault">
+			<field type="u32" name="type" fixed_value="0x9de"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="page" format="decimal"/>
+			<field type="u32" name="position" format="decimal"/>
+			<field type="u32" name="unknown4"/>
+		</subpacket>
+
+		<subpacket name="RequestSiegeWarBattles">
+			<field type="u32" name="type" fixed_value="0xb58"/>
+		</subpacket>
+
+		<!-- answered by unknownbc5 ? -->
+		<subpacket name="unknownbc3">
+			<field type="u32" name="type" fixed_value="0xbc3"/>
+			<field type="u32" name="value" format="decimal"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<!-- answered by unknownbc2 ? -->
+		<subpacket name="unknownbbf">
+			<field type="u32" name="type" fixed_value="0xbbf"/>
+			<field type="u32" name="value" format="decimal"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket>
+
+		<!-- answered by 0xbc9 -->
+		<subpacket name="SysVarRequest">
+			<field type="u32" name="type" fixed_value="0xbc8"/>
+			<field type="string" name="name" length="32"/>
+		</subpacket>
+
+		<subpacket name="EnteredZone">
+			<field type="u32" name="type" fixed_value="0xc2a"/>
+		  <field type="u32" name="zoneid" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="unknownc84">
+			<field type="u32" name="type" fixed_value="0xc84"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<!-- reply seems to be 0x1040 -->
+		<subpacket name="unknown1130">
+			<field type="u32" name="type" fixed_value="0x1130"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+	</packet>
+
+	<!--
+	  Server to client packets
+	  -->
+	<packet name="ServerResponse" source="server">
+		<field type="u32" name="type" fixed_value="0x87"/>
+		<field type="u16" name="target" enumeration="targets"/>
+		<field type="u16" name="unknown" fixed_value="0xffff"/>
+		<field type="length" name="length" />
+
+		<subpacket name="unknown8">
+			<field type="u32" name="type" fixed_value="0x8"/>
+			<field type="u32" name="unknown1" /> <!-- always 0x900b0 -->
+			<field type="u32" name="unknown2" />
+			<field type="float" name="unknown3" /> <!-- always 0.5 -->
+		</subpacket>
+
+		<subpacket name="HookCharToObject">
+			<field type="u32" name="type" fixed_value="0xa"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="someid" />
+			<field type="u32" name="charid" annotation="charid"/>
+			<annotation name="charid"/>
+		</subpacket>
+
+		<subpacket name="SelectZone">
+			<field type="u32" name="type" fixed_value="0xb"/>
+			<field type="u16" name="zoneid" format="decimal" />
+			<field type="u16" name="unknown1" format="decimal" />
+			<field type="u32" name="unknown2" format="decimal" /> <!-- always 710003 ? -->
+			<field type="u32" name="unknown3" /> <!-- 0 or ffffffff -->
+			<field type="u32" name="unknown4" /> <!-- 1? -->
+			<field type="u32" name="unknown5" /> <!-- 0? -->
+			<field type="u32" name="unknown6" /> <!-- 0? -->
+		</subpacket>
+
+		<!-- sent after SelectZone -->
+		<subpacket name="unknowne">
+			<field type="u32" name="type" fixed_value="0xe"/>
+		</subpacket>
+
+		<subpacket name="CreateObject">
+			<field type="u32" name="type" fixed_value="0x14"/>
+			<field type="u32" name="objectid" /> <!-- no annotation; won't be found anyway -->
+			<field type="u32" name="someid" />
+			<field type="u32" name="race" enumeration="look_values" annotation="sys_name" />
+			<field type="string" name="name" length="32"/>
+			<field type="u32" name="obj_flags" />
+			<field type="u32" name="max_hp" format="decimal" />
+			<field type="u32" name="max_mp" format="decimal" />
+			<field type="u32" name="unknown4" format="decimal" />
+			<field type="u32" name="max_energy" format="decimal" />
+			<field type="u32" name="cur_hp" format="decimal" />
+			<field type="u32" name="cur_mp" format="decimal" />
+			<field type="u32" name="unknown8" format="decimal" />
+			<field type="u32" name="cur_energy" format="decimal" />
+			<field type="float" name="speed" /> <!-- default speed is 50 -->
+			<field type="u32" name="level1" format="decimal" />
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="unknown2" /> <!-- was 11 -->
+			<field type="u32" name="unknown3" />
+			<field type="u32" name="class1" enumeration="class" />
+			<field type="u32" name="class2" enumeration="class" />
+			<field type="u32" name="unknown13"/>
+			<field type="u32" name="level2" format="decimal" />
+			<field type="u32" name="titleid" format="decimal" annotation="sys_name" />
+			<field type="u32" name="guildid" />
+			<field type="u32" name="unknown13b" count="2" />
+			<field type="float" name="rotate_x"/>
+			<field type="float" name="rotate_y"/>
+			<field type="float" name="rotate_z"/>
+			<!-- it appears unknown17's first few values are changed by unknown21 -->
+			<field type="u32" name="unknown17" count="11" />
+			<field type="float" name="x" />
+			<field type="float" name="y" />
+			<field type="float" name="z" />
+			<field type="float" name="angle" />
+			<field type="u32" name="charid" annotation="charid"/>
+			<!-- wonder if this is the follow object id ? -->
+			<field type="u32" name="unknown18" annotation="objectid" />
+			<field type="u32" name="obj_status" enumeration="obj_status" />
+			<field type="u32" name="unknown19" />
+			<annotation name="objectid"/>
+			<annotation name="charid"/>
+		</subpacket>
+
+		<subpacket name="DestroyObject">
+			<field type="u32" name="type" fixed_value="0x15"/>
+			<field type="u32" name="objectid" annotation="objectid" />
+			<field type="u32" name="someid" />
+		</subpacket>
+
+		<!-- I wonder if this used as a 'force object here' command -->
+		<!-- It only seems seen for the player NPC's -->
+		<subpacket name="ForceObjectPosition">
+			<field type="u32" name="type" fixed_value="0x16"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="x" />
+			<field type="float" name="y" />
+			<field type="float" name="z" />
+			<field type="float" name="angle" />
+		</subpacket>
+
+		<subpacket name="MoveObject">
+			<field type="u32" name="type" fixed_value="0x17"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="float" name="angle"/>
+			<field type="float" name="source_x"/>
+			<field type="float" name="source_y"/>
+			<field type="float" name="source_z"/>
+			<field type="u32" name="move_flags"/>
+			<!-- flags:  0 = path -->
+			<field type="u32" name="unknown5"/>
+		</subpacket> 
+
+		<subpacket name="unknown19">
+			<field type="u32" name="type" fixed_value="0x19"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="unknown2" />
+		</subpacket>
+
+		<subpacket name="ObjectSpeed">
+			<field type="u32" name="type" fixed_value="0x1a"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="speed" />
+		</subpacket>
+
+		<!-- seems only sent for player NPC's -->
+		<subpacket name="unknown1b">
+			<field type="u32" name="type" fixed_value="0x1b"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="unknown" />
+		</subpacket>
+
+		<!-- only used for looks -->
+		<subpacket name="ObjectGearLook">
+			<field type="u32" name="type" fixed_value="0x1c"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="itemid_head" annotation="sys_name"/>
+			<field type="u32" name="itemid_gloves" annotation="sys_name"/>
+			<field type="u32" name="itemid_boots" annotation="sys_name"/>
+			<field type="u32" name="itemid_armor" annotation="sys_name"/>
+			<field type="u32" name="itemid_pants" annotation="sys_name"/>
+			<field type="u32" name="itemid_cape" annotation="sys_name"/>
+			<field type="u32" name="itemid_belt" annotation="sys_name"/>
+			<field type="u32" name="itemid_shoulders" annotation="sys_name"/>
+			<field type="u32" name="itemid_weapon" annotation="sys_name"/>
+			<field type="u32" name="itemid_offhand" annotation="sys_name"/>
+			<field type="u32" name="itemid_bow" annotation="sys_name"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="itemid_wings" annotation="sys_name"/>
+			<field type="u32" name="unknown2" count="26"/>
+			<field type="u32" name="plus_head" format="decimal"/>
+			<field type="u32" name="plus_gloves" format="decimal"/>
+			<field type="u32" name="plus_boots" format="decimal"/>
+			<field type="u32" name="plus_armor" format="decimal"/>
+			<field type="u32" name="plus_pants" format="decimal"/>
+			<field type="u32" name="plus_cape" format="decimal"/>
+			<field type="u32" name="plus_belt" format="decimal"/>
+			<field type="u32" name="plus_shoulders" format="decimal"/>
+			<field type="u32" name="plus_weapon" format="decimal"/>
+			<field type="u32" name="plus_offhand" format="decimal"/>
+			<field type="u32" name="plus_bow" format="decimal"/>
+			<field type="u32" name="unknown3"/> <!-- always 0 -->
+			<field type="u32" name="unknown4"/> <!-- always 0 -->
+			<field type="u32" name="unknown5"/> <!-- always ffffffff -->
+		</subpacket> 
+
+		<subpacket name="ObjectAppearance">
+			<field type="u32" name="type" fixed_value="0x1e"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="object_appearance" name="appearance"/>
+		</subpacket> 
+
+		<!-- request is likely unknown1f -->
+		<!-- this triggers 'entering combat' -->
+		<subpacket name="unknown21">
+			<field type="u32" name="type" fixed_value="0x21"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<!-- unknown1 0x1000000 = combat bit -->
+			<field type="u32" name="unknown1"/>
+		</subpacket> 
+
+		<subpacket name="unknown26">
+			<field type="u32" name="type" fixed_value="0x26"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<subpacket name="unknown28">
+			<field type="u32" name="type" fixed_value="0x28"/>
+			<field type="u32" name="objectid" annotation="objectid" />
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<subpacket name="unknown29">
+			<field type="u32" name="type" fixed_value="0x29"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="objectid1" annotation="objectid" />
+			<field type="u32" name="objectid2" annotation="objectid" />
+			<field type="float" name="x" />
+			<field type="float" name="y" />
+			<field type="float" name="z" />
+			<field type="float" name="angle" />
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+		</subpacket>
+
+		<!-- request is SendTickCount -->
+		<subpacket name="ReplyTickCount">
+			<field type="u32" name="type" fixed_value="0x2b"/>
+			<field type="u32" name="tickcount" format="decimal" />
+		</subpacket>
+
+		<!-- initial position within a zone; sending it will trigger zone load -->
+		<subpacket name="InitialZonePosition">
+			<field type="u32" name="type" fixed_value="0x2c"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+		</subpacket> 
+
+		<!-- some kind of reset? always sent before unknown1cc -->
+		<subpacket name="unknown2f">
+			<field type="u32" name="type" fixed_value="0x2f"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1" />
+		</subpacket> 
+
+		<subpacket name="unknown32">
+			<field type="u32" name="type" fixed_value="0x32"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="guildid" />
+		</subpacket>
+
+		<subpacket name="unknown33">
+			<field type="u32" name="type" fixed_value="0x33"/>
+			<field type="u32" name="objectid" annotation="objectid" />
+			<field type="u32" name="unknown1" format="decimal" annotation="sys_name" />
+			<field type="u32" name="unknown2" />
+			<field type="u32" name="unknown3" />
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="unknown5" />
+			<field type="u32" name="unknown6" />
+			<field type="u32" name="unknown7" />
+			<field type="u32" name="unknown8" />
+			<field type="u32" name="unknown9" />
+			<field type="float" name="unknown10" />
+		</subpacket> 
+
+		<!-- response to unknown2d -->
+		<subpacket name="unknown39">
+			<field type="u32" name="type" fixed_value="0x39"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<!-- seems to be used for player moves -->
+		<subpacket name="PlayerMove">
+			<field type="u32" name="type" fixed_value="0x4c"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="u32" name="unknown1" />
+    </subpacket> 
+
+		<!-- no idea; sent after a zone change? -->
+		<subpacket name="unknown4e">
+			<field type="u32" name="type" fixed_value="0x4e"/>
+			<field type="u32" name="unknown1"/>
+			
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+		</subpacket> 
+
+		<subpacket name="unknown77">
+			<field type="u32" name="type" fixed_value="0x77"/>
+		</subpacket> 
+
+		<subpacket name="ServerTime">
+			<field type="u32" name="type" fixed_value="0x83"/>
+			<field type="u32" name="unix_time_lo"/>
+			<field type="u32" name="unix_time_hi"/>
+		</subpacket> 
+
+		<subpacket name="Whisper">
+			<field type="u32" name="type" fixed_value="0x96"/>
+			<field type="string" name="from" length="64"/>
+			<field type="string" name="to" length="64"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="length"/>
+			<field type="string" name="message" length="512"/>
+		</subpacket> 
+
+		<subpacket name="ObjectSay">
+			<field type="u32" name="type" fixed_value="0x97"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/> <!-- 1 -->
+			<field type="string" name="name" length="64"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+			<field type="length" name="length"/>
+			<field type="string" name="message" min_length="1" length="65536"/>
+		</subpacket> 
+
+		<subpacket name="DebugMessage">
+			<field type="u32" name="type" fixed_value="0x99"/>
+			<field type="length" name="length"/>
+			<field type="string" name="message" min_length="1" length="65536"/>
+		</subpacket> 
+
+		<subpacket name="Chat">
+			<field type="u32" name="type" fixed_value="0x9c"/>
+			<field type="u32" name="unknown1"/> <!-- 4 for guildchat ? -->
+			<field type="u32" name="unknown2"/> <!-- 9a7 -->
+			<field type="u32" name="unknown3"/> <!-- 0 -->
+			<field type="u32" name="unknown4"/> <!-- 12f8b4 -->
+			<field type="string" name="charname" length="64"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/> <!-- 0 ? -->
+			<field type="u32" name="message_length"/> <!-- not using length because more may be present -->
+			<field type="string" name="message" min_length="1" length="65536"/>
+		</subpacket> 
+
+		<subpacket name="DisplayYellowText">
+			<field type="u32" name="type" fixed_value="0xa1"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+			<field type="string" name="message" min_length="1" length="65536"/>
+		</subpacket> 
+
+		<!-- sent during login; no idea why -->
+		<subpacket name="unknownc8">
+			<field type="u32" name="type" fixed_value="0xc8"/>
+		</subpacket> 
+
+		<subpacket name="CharList">
+			<field type="u32" name="type" fixed_value="0xcd"/>
+			<field type="u32" name="charid1"/>
+			<field type="u32" name="charid2"/> <!-- always equal to previous one? -->
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="zone"/>
+			<field type="u8" name="unknown1" count="28"/>
+			<field type="u32" name="base_look" enumeration="look_values"/>
+			<field type="u32" name="level1"/>
+			<field type="u32" name="level2"/>
+			<field type="u32" name="unknown2"/> <!-- 0 or 1 -->
+			<field type="u32" name="unknown3"/> <!-- 0 or 1 -->
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+			<field type="char_appearance" name="appearance"/>
+			<field type="item_info" name="item_head"/>
+			<field type="item_info" name="item_hands"/>
+			<field type="item_info" name="item_boots"/>
+			<field type="item_info" name="item_upper"/>
+			<field type="item_info" name="item_lower"/>
+			<field type="item_info" name="item_cape"/>
+			<field type="item_info" name="item_belt"/>
+			<field type="item_info" name="item_shoulders"/>
+			<field type="item_info" name="item_amulet"/>
+			<field type="item_info" name="item_arrow"/>
+			<field type="item_info" name="item_bow"/>
+			<field type="item_info" name="item_ring_l"/>
+			<field type="item_info" name="item_ring_r"/>
+			<field type="item_info" name="item_earring_l"/>
+			<field type="item_info" name="item_earring_r"/>
+			<field type="item_info" name="item_weapon"/>
+			<field type="item_info" name="item_offhand"/>
+			<field type="item_info" name="item_unused1"/>
+			<field type="item_info" name="item_unused2"/>
+			<field type="item_info" name="item_unused3"/>
+			<field type="item_info" name="item_unused4"/>
+			<field type="item_info" name="item_wings"/>
+			<field type="u32" name="unknown4" fixed_value="0"/>
+			<field type="u32" name="unknown5" fixed_value="0"/>
+			<field type="u32" name="unknown6" fixed_value="0xffffffff"/>
+		</subpacket>
+
+		<subpacket name="CharListEnd">
+			<field type="u32" name="type" fixed_value="0xce"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<!-- response to 0xd7 -->
+		<subpacket name="AckSelectChar">
+			<field type="u32" name="type" fixed_value="0xda"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="charid" annotation="charid"/>
+		</subpacket> 
+
+		<!-- seems to be sent after AckSelectChar -->
+		<subpacket name="unknowndb">
+			<field type="u32" name="type" fixed_value="0xdb"/>
+		</subpacket> 
+
+		<!-- response is ReplyAccountName -->
+		<subpacket name="RequestAccountName">
+			<field type="u32" name="type" fixed_value="0xde"/>
+			<field type="u32" name="unknown1" />
+		</subpacket> 
+
+		<!-- response to 0xe0 -->
+		<subpacket name="unknowne0">
+			<field type="u32" name="type" fixed_value="0xe0"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="unknown2" />
+		</subpacket> 
+
+    <!-- I wonder if this should be followed by 0xdf -->
+		<subpacket name="unknownf7">
+			<field type="u32" name="type" fixed_value="0xf7"/>
+			<field type="u32" name="unknown" />
+		</subpacket> 
+
+		<!-- answered by 0xfb -->
+		<subpacket name="WantSecondaryPassword">
+			<field type="u32" name="type" fixed_value="0xfa"/>
+		</subpacket> 
+
+		<!-- sent during login; no idea why -->
+		<subpacket name="unknownff">
+			<field type="u32" name="type" fixed_value="0xff"/>
+			<field type="u32" name="unknown1" />
+		</subpacket> 
+
+		<!-- triggers the 'you obtained item' text -->
+		<subpacket name="YouObtainedItem">
+			<field type="u32" name="type" fixed_value="0x163"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="quantity" format="decimal"/>
+			<field type="u32" name="itemid" annotation="sys_name"/>
+		</subpacket> 
+
+		<!-- sent after unknowne -->
+		<subpacket name="unknown164">
+			<field type="u32" name="type" fixed_value="0x164"/>
+		</subpacket>
+
+		<subpacket name="ReceiveItem">
+			<field type="u32" name="type" fixed_value="0x165"/>
+			<field type="item_info" name="item"/>
+		</subpacket> 
+
+		<subpacket name="AcknowledgeItemSwap">
+			<field type="u32" name="type" fixed_value="0x16a"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+		</subpacket>
+
+		<!-- used both equipping and moving items around and updating their stats -->
+		<subpacket name="MoveItem">
+			<field type="u32" name="type" fixed_value="0x16f"/>
+			<field type="item_info" name="item"/>
+			<field type="u16" name="unknown1"/>
+			<field type="u16" name="position" format="decimal"/>
+		</subpacket> 
+
+		<!-- used to pay/obtain gold/dia/rubies -->
+		<subpacket name="unknown172">
+			<field type="u32" name="type" fixed_value="0x172"/>
+			<field type="u32" name="unknown1" format="decimal"/>
+			<field type="u32" name="unknown2" format="decimal"/>
+			<field type="u32" name="unknown3" format="decimal"/>
+			<field type="u32" name="unknown4" format="decimal"/>
+		</subpacket> 
+
+		<!--
+			adds a recipe to the list; or another item - I see references to
+		  things in keyitemobject.db here, but those don't seem to do anything
+		   
+		  it is also used to mark a quest as completed
+		 -->
+		<subpacket name="unknown179">
+			<field type="u32" name="type" fixed_value="0x179"/>
+			<field type="u32" name="itemid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket> 
+
+		<!-- I think this is quest-related (or maybe NPC drop?) -->
+		<subpacket name="unknown1a0">
+			<field type="u32" name="type" fixed_value="0x1a0"/>
+			<field type="item_info" name="item"/>
+		</subpacket>
+
+		<subpacket name="HitObject">
+			<field type="u32" name="type" fixed_value="0x1a5"/>
+			<field type="u32" name="sourceobj" annotation="objectid"/>
+			<field type="u32" name="targetobj" annotation="objectid"/>
+			<field type="u32" name="damage" format="decimal"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="hit_type" enumeration="hit_type"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket> 
+
+		<subpacket name="ObjectDied">
+			<field type="u32" name="type" fixed_value="0x1a6"/>
+			<field type="u32" name="target_id" annotation="objectid"/>
+			<field type="u32" name="objectid1" annotation="objectid"/>
+			<field type="u32" name="unknown3"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="float" name="angle"/>
+			<field type="u32" name="objectid2" annotation="objectid"/>
+			<field type="u32" name="unknown9"/>
+			<field type="u32" name="unknown10"/>
+		</subpacket> 
+
+		<subpacket name="ReviveObject">
+			<field type="u32" name="type" fixed_value="0x1a7"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket> 
+
+		<subpacket name="SetObjectStats">
+			<field type="u32" name="type" fixed_value="0x1a9"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="hp" format="decimal"/>
+			<field type="u32" name="mp" format="decimal"/>
+			<field type="u32" name="energy" format="decimal"/>
+			<field type="u32" name="focus" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="SetObjectMaxStats">
+			<field type="u32" name="type" fixed_value="0x1aa"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="max_hp" format="decimal"/>
+			<field type="u32" name="max_mp" format="decimal"/>
+			<!-- XXX next is guesswork -->
+			<field type="u32" name="max_rage" format="decimal"/>
+			<field type="u32" name="max_focus" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="BasicAttack">
+			<field type="u32" name="type" fixed_value="0x1ac"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/> <!-- always 0? -->
+		</subpacket>
+
+		<subpacket name="PartyMemberCurrentStats">
+			<field type="u32" name="type" fixed_value="0x1ad"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="hp" format="decimal"/>
+			<field type="u32" name="mp" format="decimal"/>
+			<field type="u32" name="unknown3" format="decimal"/>
+			<field type="u32" name="unknown4" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="PartyMemberMaxStats">
+			<field type="u32" name="type" fixed_value="0x1ae"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="max_hp" format="decimal"/>
+			<field type="u32" name="max_mp" format="decimal"/>
+			<field type="u32" name="max_energy" format="decimal"/>
+			<field type="u32" name="max_focus" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="SetObjectTarget">
+			<field type="u32" name="type" fixed_value="0x1af"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="objectid_target" annotation="objectid"/>
+		</subpacket>
+
+		<!-- used to go to combat stance; dunno if can do more? -->
+		<subpacket name="SetCombatStance">
+			<field type="u32" name="type" fixed_value="0x1b0"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="unknown1"/>
+		</subpacket>
+
+		<!-- sent after InitialZonePosition; maybe reset pose? -->
+		<subpacket name="unknown1b1">
+			<field type="u32" name="type" fixed_value="0x1b1"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<!-- This is weird; it is also used for class changes,
+		  -->
+		<subpacket name="UpdatePlayerStat">
+			<field type="u32" name="type" fixed_value="0x1c4"/>
+			<field type="u32" name="stat_index" enumeration="stat_index"/>
+			<field type="double" name="value"/>
+		</subpacket>
+
+		<subpacket name="unknown1c7">
+			<field type="u32" name="type" fixed_value="0x1c7"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="SetPlayerTitle">
+			<field type="u32" name="type" fixed_value="0x1cb"/>
+			<field type="u32" name="titleid" format="decimal" annotation="sys_name"/>
+			<field type="float" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="SetClassAndLevel">
+			<field type="u32" name="type" fixed_value="0x1cc"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+		</subpacket>
+
+		<!-- only seen it after dialogue box choice -->
+		<subpacket name="unknown1cd">
+			<field type="u32" name="type" fixed_value="0x1cd"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="RewardXPorTP">
+			<field type="u32" name="type" fixed_value="0x1d6"/>
+			<field type="u32" name="reward_type" enumeration="stat_index"/>
+			<field type="double" name="value"/>
+		</subpacket>
+
+		<subpacket name="AckChangeChar">
+			<field type="u32" name="type" fixed_value="0x1d7"/>
+			<field type="u32" name="countdown" format="decimal"/> <!-- 10 -->
+		</subpacket>
+
+		<subpacket name="SetObjectFlags">
+			<field type="u32" name="type" fixed_value="0x1e0"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="flags"/>
+		</subpacket>
+
+		<!-- response to unknown235 -->
+		<subpacket name="DialogueBox">
+			<field type="u32" name="type" fixed_value="0x236"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="show_quests"/> <!-- if non-zero, displays available quests -->
+			<field type="u32" name="count"/>
+			<!-- how to make support for this? -->
+			<field type="u8" name="data" min_count="0" count="65536" display="16"/>
+		</subpacket>
+
+		<subpacket name="unknown238">
+			<field type="u32" name="type" fixed_value="0x238"/>
+		</subpacket>
+
+		<subpacket name="unknown239">
+			<field type="u32" name="type" fixed_value="0x239"/>
+		</subpacket>
+
+		<!-- when a skill damages things -->
+		<subpacket name="unknown25d">
+			<field type="u32" name="type" fixed_value="0x25d"/>
+			<field type="u32" name="skill" format="decimal"/> <!-- guess -->
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="skilluse_cookie"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown6"/>
+			<field type="float" name="unknown7"/>
+			<field type="u32" name="unknown8"/>
+			<field type="u32" name="unknown9"/>
+			<field type="u32" name="unknown10"/>
+			<field type="float" name="unknown11"/>
+			<field type="u32" name="unknown12"/>
+			<field type="u32" name="unknown13"/>
+			<field type="u32" name="unknown14"/>
+			<field type="float" name="unknown15"/>
+			<field type="u32" name="unknown16"/>
+		</subpacket>
+
+		<!-- maybe to cancel a skill use cookie? -->
+		<subpacket name="unknown260">
+			<field type="u32" name="type" fixed_value="0x260"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="skilluse_cookie"/>
+		</subpacket>
+
+		<subpacket name="ObjectPosition">
+			<field type="u32" name="type" fixed_value="0x264"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="u32" name="flags"/>
+		</subpacket> 
+
+		<subpacket name="Buff">
+			<field type="u32" name="type" fixed_value="0x265"/>
+			<field type="u32" name="objectid1" annotation="objectid"/>
+			<field type="u32" name="buffid" annotation="sys_name"/>
+			<field type="u32" name="objectid2" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="unknown269">
+			<field type="u32" name="type" fixed_value="0x269"/>
+			<field type="u32" name="objectid1" annotation="objectid"/>
+			<field type="u32" name="objectid2" annotation="objectid"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="skill_cookie"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+		</subpacket>
+
+		<subpacket name="QuestAccepted">
+			<field type="u32" name="type" fixed_value="0x22c"/>
+			<field type="u32" name="questid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket>
+
+		<subpacket name="QuestCompleted">
+			<field type="u32" name="type" fixed_value="0x22d"/>
+			<field type="u32" name="questid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="unknown233">
+			<field type="u32" name="type" fixed_value="0x233"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="questid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="itemid" annotation="sys_name"/>
+		</subpacket>
+
+		<subpacket name="ObjectUsingSkill">
+			<field type="u32" name="type" fixed_value="0x25a"/>
+			<field type="u32" name="objectid_source" annotation="objectid"/>
+			<field type="u32" name="objectid_target" annotation="objectid"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="u32" name="skilluse_cookie"/>
+			<field type="u32" name="unknown8"/>
+			<field type="u32" name="unknown9"/>
+		</subpacket>
+
+    <!-- maybe to cancel skill? -->
+		<subpacket name="CancelUseSkill">
+			<field type="u32" name="type" fixed_value="0x25b"/>
+			<field type="u32" name="skilluse_cookie"/>
+		</subpacket>
+
+		<!-- reply for 0x258; but can also be sent out of the blue -->
+		<subpacket name="ResponseUseSkill">
+			<field type="u32" name="type" fixed_value="0x25c"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="skilluse_cookie"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+		</subpacket>
+
+		<subpacket name="UseSkillEffect">
+			<field type="u32" name="type" fixed_value="0x25d"/>
+			<field type="u32" name="effect_id"/>
+			<field type="u32" name="attribute" enumeration="useskilleffect_attr" />
+			<field type="u32" name="skilluse_cookie"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="effect_type" enumeration="useskilleffect_type"/>
+			<field type="float" name="value"/>
+			<field type="float" name="unknown7"/>
+		</subpacket>
+
+		<!-- seems to be used when a skill triggers a buff -->
+		<subpacket name="UseSkillBuff">
+			<field type="u32" name="type" fixed_value="0x25e"/>
+			<field type="u32" name="buffid" annotation="sys_name"/>
+			<field type="u32" name="skilluse_cookie"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="duration"/> <!-- seconds -->
+			<field type="u32" name="unknown7"/> <!-- 1 works -->
+		</subpacket>
+
+		<subpacket name="unknown268">
+			<field type="u32" name="type" fixed_value="0x268"/>
+			<field type="u32" name="skilluse_cookie"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+			<field type="u32" name="unknown7"/>
+			<field type="u32" name="unknown8"/>
+			<field type="float" name="x"/>
+			<field type="float" name="y"/>
+			<field type="float" name="z"/>
+			<field type="u32" name="unknown12"/>
+			<field type="u32" name="unknown13"/>
+			<field type="u32" name="unknown14"/>
+			<field type="u32" name="unknown15"/>
+			<field type="u32" name="unknown16"/>
+			<field type="u32" name="unknown17"/>
+			<field type="u32" name="unknown18"/>
+			<field type="u32" name="unknown19"/>
+			<field type="u32" name="unknown20"/>
+			<field type="float" name="unknown21"/>
+			<field type="u32" name="unknown22"/>
+			<field type="u32" name="unknown23"/>
+			<field type="u32" name="unknown24"/>
+			<field type="u32" name="unknown25"/>
+			<field type="u32" name="unknown26"/>
+			<field type="u32" name="unknown27"/>
+			<field type="u32" name="unknown28"/>
+			<field type="u32" name="unknown29"/>
+			<field type="u32" name="unknown30"/>
+			<field type="u32" name="unknown31"/>
+			<field type="u32" name="unknown32"/>
+			<field type="u32" name="unknown33"/>
+			<field type="u32" name="unknown34"/>
+			<field type="u32" name="unknown35"/>
+			<field type="u32" name="unknown36"/>
+			<field type="u32" name="unknown37"/>
+			<field type="u32" name="unknown38"/>
+			<field type="u32" name="unknown39"/>
+			<field type="u32" name="unknown40"/>
+			<field type="u32" name="unknown41"/>
+			<field type="u32" name="unknown42"/>
+			<field type="u32" name="unknown43"/>
+			<field type="u32" name="unknown44"/>
+			<field type="u32" name="unknown45"/>
+			<field type="u32" name="unknown46"/>
+			<field type="u32" name="unknown47"/>
+			<field type="u32" name="unknown48"/>
+			<field type="u32" name="unknown49"/>
+			<field type="u32" name="unknown50"/>
+			<field type="u32" name="unknown51"/>
+			<field type="u32" name="unknown52"/>
+			<field type="u32" name="unknown53"/>
+			<field type="u32" name="unknown54"/>
+			<field type="u32" name="unknown55"/>
+			<field type="u32" name="unknown56"/>
+			<field type="u32" name="unknown57"/>
+			<field type="u32" name="unknown58"/>
+			<field type="u32" name="unknown59"/>
+			<field type="u32" name="unknown60"/>
+			<field type="u32" name="unknown61"/>
+			<field type="u32" name="unknown62"/>
+			<field type="u32" name="unknown63"/>
+			<field type="u32" name="unknown64"/>
+			<field type="u32" name="unknown65"/>
+			<field type="u32" name="unknown66"/>
+			<field type="u32" name="unknown67"/>
+			<field type="u32" name="unknown68"/>
+			<field type="u32" name="unknown69"/>
+			<field type="u32" name="unknown70"/>
+			<field type="u32" name="unknown71"/>
+			<field type="u32" name="unknown72"/>
+			<field type="u32" name="unknown73"/>
+			<field type="u32" name="unknown74"/>
+			<field type="u32" name="unknown75"/>
+			<field type="u32" name="unknown76"/>
+			<field type="u32" name="unknown77"/>
+			<field type="u32" name="unknown78"/>
+			<field type="u32" name="unknown79"/>
+			<field type="u32" name="unknown80"/>
+			<field type="u32" name="unknown81"/>
+			<field type="u32" name="unknown82"/>
+			<field type="u32" name="unknown83"/>
+			<field type="u32" name="unknown84"/>
+			<field type="u32" name="unknown85"/>
+			<field type="u32" name="unknown86"/>
+			<field type="u32" name="unknown87"/>
+			<field type="u32" name="unknown88"/>
+			<field type="u32" name="unknown89"/>
+			<field type="u32" name="unknown90"/>
+			<field type="u32" name="unknown91"/>
+			<field type="u32" name="unknown92"/>
+			<field type="u32" name="unknown93"/>
+			<field type="u32" name="unknown94"/>
+			<field type="u32" name="unknown95"/>
+			<field type="u32" name="unknown96"/>
+			<field type="u32" name="unknown97"/>
+			<field type="u32" name="unknown98"/>
+			<field type="u32" name="unknown99"/>
+			<field type="u32" name="unknown100"/>
+			<field type="u32" name="unknown101"/>
+			<field type="u32" name="unknown102"/>
+		</subpacket>
+
+		<!-- destroys a cookie created by 0x269 ? -->
+		<subpacket name="unknown26a">
+			<field type="u32" name="type" fixed_value="0x26a"/>
+			<field type="u32" name="skill_cookie"/>
+		</subpacket>
+
+		<subpacket name="unknown26c">
+			<field type="u32" name="type" fixed_value="0x26c"/>
+			<field type="u32" name="skillid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket>
+
+		<subpacket name="unknown274">
+			<field type="u32" name="type" fixed_value="0x274"/>
+			<field type="u32" name="skilluse_cookie"/>
+		</subpacket>
+
+    <!-- sent when an attack is made on a target which is too far away -->
+		<subpacket name="TargetTooFarAway">
+			<field type="u32" name="type" fixed_value="0x296"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<!-- always sent during login; always empty -->
+		<subpacket name="unknown2cd">
+			<field type="u32" name="type" fixed_value="0x2cd"/>
+			<field type="u8" name="unknown1" count="724" display="1"/> <!-- always 0 -->
+		</subpacket>
+
+		<subpacket name="RequestJoinParty">
+			<field type="u32" name="type" fixed_value="0x321"/>
+		  <field type="string" name="charname" length="64"/>
+			<field type="u32" name="unknown2"/>
+		</subpacket>
+
+		<!-- response to 0x320 -->
+		<subpacket name="CreateParty">
+			<field type="u32" name="type" fixed_value="0x326"/>
+			<field type="u32" name="partyid"/>
+			<field type="u32" name="unknown2"/>
+			<field type="string" name="charname1" length="charname_length"/>
+			<field type="string" name="charname2" length="charname_length"/>
+			<field type="u8" name="unknown3" count="32"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+		</subpacket>
+
+		<subpacket name="PartyMemberJoined">
+			<field type="u32" name="type" fixed_value="0x327"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="unknown9"/>
+			<field type="u32" name="unknown10"/>
+			<field type="u32" name="unknown11"/>
+			<field type="u32" name="unknown12"/>
+		</subpacket>
+
+		<subpacket name="PartyMemberLeft">
+			<field type="u32" name="type" fixed_value="0x328"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+		  <field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+			<field type="u32" name="unknown7"/>
+			<field type="u32" name="unknown8"/>
+		</subpacket>
+
+		<subpacket name="PartyMemberInfo">
+			<field type="u32" name="type" fixed_value="0x329"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="unknown9"/>
+			<field type="u32" name="unknown10"/>
+			<field type="u32" name="unknown11"/>
+			<field type="u32" name="unknown12"/>
+		</subpacket>
+
+		<!-- used to display a dialog with variable substitutions -->
+		<subpacket name="Dialogue">
+			<field type="u32" name="type" fixed_value="0x355"/>
+			<field type="u32" name="unk1"/> <!-- 0? -->
+			<field type="string" name="content" length="256"/>
+		</subpacket>
+
+		<subpacket name="DialogueChoice">
+			<field type="u32" name="type" fixed_value="0x356"/>
+			<field type="string" name="choice" length="64"/>
+		</subpacket>
+
+		<!-- reply to unknown35b -->
+		<subpacket name="unknown35c">
+			<field type="u32" name="type" fixed_value="0x35c"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2" format="decimal"/>
+			<field type="u32" name="itemid" annotation="sys_name"/>
+			<field type="u32" name="unknown3"/>
+		</subpacket>
+
+		<!-- request seems to be unknown360 -->
+		<subpacket name="unknown361">
+			<field type="u32" name="type" fixed_value="0x361"/>
+			<field type="u32" name="unknown1"/> <!-- always c ? -->
+			<field type="u32" name="unknown2"/> <!-- 15f -->
+			<field type="u32" name="objectid1" annotation="objectid"/>
+			<field type="u32" name="objectid2" annotation="objectid"/>
+		</subpacket>
+
+		<subpacket name="unknown36f">
+			<field type="u32" name="type" fixed_value="0x36f"/>
+			<field type="u32" name="objectid1" annotation="objectid"/>
+			<field type="u32" name="charid1" />
+			<field type="u32" name="objectid2" annotation="objectid"/>
+			<field type="u32" name="unknown1"/> <!-- 12? -->
+			<field type="u32" name="unknown2"/> <!-- 1c? -->
+			<field type="u32" name="unknown3"/> <!-- 0? -->
+			<field type="u32" name="unknown4"/> <!-- -1? -->
+			<field type="u32" name="unknown5"/> <!-- 0? -->
+			<field type="u8"  name="unknown6" count="1172" />
+			<field type="u32" name="unknown7"/> <!-- 1? -->
+			<field type="u32" name="unknown8"/> <!-- 1? -->
+			<field type="u32" name="unknown9"/> <!-- 1e? -->
+			<field type="u32" name="unknown10"/> <!-- 2? -->
+			<field type="u32" name="charid2" />
+		</subpacket>
+
+		<!-- seems a reply to SecondaryPassword2 -->
+		<subpacket name="unknown375">
+			<field type="u32" name="type" fixed_value="0x375"/>
+			<field type="string" name="password" length="32"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<!-- seems to be item shop categories -->
+		<subpacket name="ItemShopInfo">
+			<field type="u32" name="type" fixed_value="0x382"/>
+			<field type="u32" name="unknown1"/> <!-- 0x186, 0x1e5, 0x224, ... ? -->
+			<field type="u32" name="unknown2"/> <!-- 0x241f, 0x193a, ... ? -->
+			<!-- XXX item shop info needs work -->
+			<transformation name="rompack"/>
+			<field type="u8" name="unknown3" min_count="0" count="262144" display="1" />
+		</subpacket> 
+
+		<subpacket name="unknown385">
+			<field type="u32" name="type" fixed_value="0x385"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket> 
+
+		<!-- answer to 0x3a5; this sometimes has questid? -->
+		<subpacket name="ParameterReply">
+			<field type="u32" name="type" fixed_value="0x3a7"/>
+			<field type="u32" name="num" enumeration="parameters"/>
+			<field type="length" name="length" />
+			<!-- transformation name="rompack" -->
+			<!-- field type="u8" name="data" min_count="0" count="1048576" display="1" -->
+		</subpacket>
+
+		<subpacket name="unknown3a9">
+			<field type="u32" name="type" fixed_value="0x3a9"/>
+			<field type="u32" name="unknown1"/>
+			<field type="float" name="unknown2"/>
+		</subpacket>
+
+		<subpacket name="FriendOnline">
+			<field type="u32" name="type" fixed_value="0x3b9"/>
+			<field type="u32" name="charid" />
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="guildid"/>
+			<field type="u32" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+		</subpacket>
+
+		<subpacket name="FriendOffline">
+			<field type="u32" name="type" fixed_value="0x3ba"/>
+			<field type="u32" name="charid" />
+		</subpacket>
+
+		<subpacket name="FriendList">
+			<field type="u32" name="type" fixed_value="0x3bf"/>
+			<field type="length" name="length"/>
+			<transformation name="rompack"/>
+			<field type="friend_info" name="friendinfo"/>
+		</subpacket>
+
+		<subpacket name="CharacterInZone">
+			<field type="u32" name="type" fixed_value="0x3c5"/>
+			<field type="u32" name="unknown1" /> <!-- always 0x1a ? -->
+			<field type="u32" name="count" /> <!-- starts with 0 -->
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u8" name="unknown2" count="32"/> <!-- maybe part of previous? -->
+			<field type="u32" name="class1" enumeration="class"/>
+			<field type="u32" name="class2" enumeration="class"/>
+			<field type="u32" name="level1"/>
+			<field type="u32" name="level2"/>
+			<field type="u32" name="titleid" />
+			<field type="u32" name="guildid"/>
+			<field type="u32" name="unknown3"/> <!-- followup count? -->
+			<field type="u8" name="unknown4" count="32"/>
+		</subpacket>
+
+		<!-- request seems to be 3da -->
+		<subpacket name="unknown3da">
+			<field type="u32" name="type" fixed_value="0x3db"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1"/>
+			<field type="float" name="unknown2"/>
+			<field type="float" name="unknown3"/>
+			<field type="float" name="unknown4"/>
+			<field type="float" name="unknown5"/>
+		</subpacket>
+
+		<!--
+			 Covers the cost of styling, renting inventory/bank/house energy etc
+		  -->
+		<subpacket name="ActivityCosts">
+		  <field type="u32" name="type" fixed_value="0x37d"/>
+		  <field type="u32" name="unknown1"/>
+		  <field type="length" name="length"/>
+			<transformation name="rompack"/>
+      <field type="activity_cost" name="cost1" />
+      <field type="activity_cost" name="cost2" />
+      <field type="activity_cost" name="cost3" />
+      <field type="activity_cost" name="cost4" />
+      <field type="activity_cost" name="cost5" />
+      <field type="activity_cost" name="cost6" />
+      <field type="activity_cost" name="cost7" />
+      <field type="activity_cost" name="cost8" />
+      <field type="activity_cost" name="cost9" />
+      <field type="activity_cost" name="cost10" />
+      <field type="activity_cost" name="cost11" />
+      <field type="activity_cost" name="cost12" />
+      <field type="activity_cost" name="cost13" />
+      <field type="activity_cost" name="cost14" />
+      <field type="activity_cost" name="cost15" />
+      <field type="activity_cost" name="cost16" />
+      <field type="activity_cost" name="cost17" />
+      <field type="activity_cost" name="cost18" />
+      <field type="activity_cost" name="cost19" />
+      <field type="activity_cost" name="cost20" />
+      <field type="activity_cost" name="cost21" />
+      <field type="activity_cost" name="cost22" />
+      <field type="activity_cost" name="cost23" />
+      <field type="activity_cost" name="cost24" />
+      <field type="activity_cost" name="cost25" />
+      <field type="activity_cost" name="cost26" />
+      <field type="activity_cost" name="cost27" />
+      <field type="activity_cost" name="cost28" />
+      <field type="activity_cost" name="cost29" />
+      <field type="activity_cost" name="cost30" />
+      <field type="activity_cost" name="cost31" />
+      <field type="activity_cost" name="cost32" />
+      <field type="activity_cost" name="cost33" />
+      <field type="activity_cost" name="cost34" />
+      <field type="activity_cost" name="cost35" />
+      <field type="activity_cost" name="cost36" />
+      <field type="activity_cost" name="cost37" />
+      <field type="activity_cost" name="cost38" />
+      <field type="activity_cost" name="cost39" />
+      <field type="activity_cost" name="cost40" />
+      <field type="activity_cost" name="cost41" />
+      <field type="activity_cost" name="cost42" />
+      <field type="activity_cost" name="cost43" />
+      <field type="activity_cost" name="cost44" />
+      <field type="activity_cost" name="cost45" />
+      <field type="activity_cost" name="cost46" />
+      <field type="activity_cost" name="cost47" />
+      <field type="activity_cost" name="cost48" />
+      <field type="activity_cost" name="cost49" />
+      <field type="activity_cost" name="cost50" />
+      <field type="activity_cost" name="cost51" />
+      <field type="activity_cost" name="cost52" />
+      <field type="activity_cost" name="cost53" />
+      <field type="activity_cost" name="cost54" />
+      <field type="activity_cost" name="cost55" />
+      <field type="activity_cost" name="cost56" />
+      <field type="activity_cost" name="cost57" />
+      <field type="activity_cost" name="cost58" />
+      <field type="activity_cost" name="cost59" />
+      <field type="activity_cost" name="cost60" />
+      <field type="activity_cost" name="cost61" />
+      <field type="activity_cost" name="cost62" />
+      <field type="activity_cost" name="cost63" />
+      <field type="activity_cost" name="cost64" />
+      <field type="activity_cost" name="cost65" />
+      <field type="activity_cost" name="cost66" />
+      <field type="activity_cost" name="cost67" />
+      <field type="activity_cost" name="cost68" />
+      <field type="activity_cost" name="cost69" />
+      <field type="activity_cost" name="cost70" />
+      <field type="activity_cost" name="cost71" />
+      <field type="activity_cost" name="cost72" />
+      <field type="activity_cost" name="cost73" />
+      <field type="activity_cost" name="cost74" />
+      <field type="activity_cost" name="cost75" />
+      <field type="activity_cost" name="cost76" />
+      <field type="activity_cost" name="cost77" />
+      <field type="activity_cost" name="cost78" />
+      <field type="activity_cost" name="cost79" />
+      <field type="activity_cost" name="cost80" />
+      <field type="activity_cost" name="cost81" />
+      <field type="activity_cost" name="cost82" />
+      <field type="activity_cost" name="cost83" />
+      <field type="activity_cost" name="cost84" />
+      <field type="activity_cost" name="cost85" />
+      <field type="activity_cost" name="cost86" />
+      <field type="activity_cost" name="cost87" />
+      <field type="activity_cost" name="cost88" />
+      <field type="activity_cost" name="cost89" />
+      <field type="activity_cost" name="cost90" />
+      <field type="activity_cost" name="cost91" />
+      <field type="activity_cost" name="cost92" />
+      <field type="activity_cost" name="cost93" />
+      <field type="activity_cost" name="cost94" />
+      <field type="activity_cost" name="cost95" />
+      <field type="activity_cost" name="cost96" />
+      <field type="activity_cost" name="cost97" />
+      <field type="activity_cost" name="cost98" />
+      <field type="activity_cost" name="cost99" />
+      <field type="activity_cost" name="cost100" />
+      <field type="activity_cost" name="cost101" />
+      <field type="activity_cost" name="cost102" />
+      <field type="activity_cost" name="cost103" />
+      <field type="activity_cost" name="cost104" />
+      <field type="activity_cost" name="cost105" />
+      <field type="activity_cost" name="cost106" />
+      <field type="activity_cost" name="cost107" />
+      <field type="activity_cost" name="cost108" />
+      <field type="activity_cost" name="cost109" />
+      <field type="activity_cost" name="cost110" />
+      <field type="activity_cost" name="cost111" />
+      <field type="activity_cost" name="cost112" />
+      <field type="activity_cost" name="cost113" />
+      <field type="activity_cost" name="cost114" />
+      <field type="activity_cost" name="cost115" />
+      <field type="activity_cost" name="cost116" />
+      <field type="activity_cost" name="cost117" />
+      <field type="activity_cost" name="cost118" />
+      <field type="activity_cost" name="cost119" />
+      <field type="activity_cost" name="cost120" />
+      <field type="activity_cost" name="cost121" />
+      <field type="activity_cost" name="cost122" />
+      <field type="activity_cost" name="cost123" />
+      <field type="activity_cost" name="cost124" />
+      <field type="activity_cost" name="cost125" />
+      <field type="activity_cost" name="cost126" />
+      <field type="activity_cost" name="cost127" />
+      <field type="activity_cost" name="cost128" />
+      <field type="activity_cost" name="cost129" />
+      <field type="activity_cost" name="cost130" />
+      <field type="activity_cost" name="cost131" />
+      <field type="activity_cost" name="cost132" />
+      <field type="activity_cost" name="cost133" />
+      <field type="activity_cost" name="cost134" />
+      <field type="activity_cost" name="cost135" />
+      <field type="activity_cost" name="cost136" />
+      <field type="activity_cost" name="cost137" />
+      <field type="activity_cost" name="cost138" />
+      <field type="activity_cost" name="cost139" />
+      <field type="activity_cost" name="cost140" />
+      <field type="activity_cost" name="cost141" />
+      <field type="activity_cost" name="cost142" />
+      <field type="activity_cost" name="cost143" />
+      <field type="activity_cost" name="cost144" />
+      <field type="activity_cost" name="cost145" />
+      <field type="activity_cost" name="cost146" />
+      <field type="activity_cost" name="cost147" />
+      <field type="activity_cost" name="cost148" />
+      <field type="activity_cost" name="cost149" />
+      <field type="activity_cost" name="cost150" />
+      <field type="activity_cost" name="cost151" />
+      <field type="activity_cost" name="cost152" />
+      <field type="activity_cost" name="cost153" />
+      <field type="activity_cost" name="cost154" />
+      <field type="activity_cost" name="cost155" />
+      <field type="activity_cost" name="cost156" />
+      <field type="activity_cost" name="cost157" />
+      <field type="activity_cost" name="cost158" />
+		</subpacket>
+
+		<!-- guess this is mail sent to -->
+		<subpacket name="unknown3ee">
+		  <field type="u32" name="type" fixed_value="0x3ee"/>
+			<field type="u32" name="unknown1"/>
+			<field type="string" name="recipient" length="charname_length"/>
+		</subpacket>
+
+		<subpacket name="unknown3f8">
+		  <field type="u32" name="type" fixed_value="0x3f8"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="index" format="decimal"/>
+			<field type="item_info" name="item"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="skip1" count="155"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="unknown4"/>
+			<field type="float" name="unknown5"/>
+			<field type="string" name="sender" length="charname_length"/>
+			<field type="string" name="recipient" length="charname_length"/>
+			<field type="string" name="subject" length="32"/>
+			<field type="u32" name="unknown6"/>
+			<field type="u32" name="unknown7"/>
+			<field type="u32" name="unknown8"/>
+			<field type="string" name="body" length="2048" />
+		</subpacket>
+
+		<subpacket name="unknown4ed">
+		  <field type="u32" name="type" fixed_value="0x4ed"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="CharInfo">
+		  <field type="u32" name="type" fixed_value="0x4ee"/>
+		  <field type="length" name="length"/>
+			<transformation name="rompack"/>
+			<field type="char_info" name="charinfo"/>
+		</subpacket> 
+
+		<subpacket name="unknown4f8">
+			<field type="u32" name="type" fixed_value="0x4f8"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="float" name="unknown3"/>
+			<field type="float" name="unknown4"/>
+			<field type="float" name="unknown5"/>
+			<field type="u32" name="unknown6"/>
+			<field type="u32" name="unknown7"/>
+			<field type="u32" name="unknown8"/>
+		</subpacket> 
+
+		<subpacket name="SendFlag">
+			<field type="u32" name="type" fixed_value="0x4fd"/>
+			<field type="u32" name="num"/>
+			<field type="u32" name="unknown"/>
+		</subpacket>
+
+		<!-- triggers the: "You have learned ..." message -->
+		<subpacket name="YouHaveLearned">
+			<field type="u32" name="type" fixed_value="0x519"/>
+			<field type="u32" name="itemid" format="decimal"/>
+			<field type="u32" name="unknown1"/>
+		</subpacket>
+
+		<subpacket name="GuildInfo">
+			<field type="u32" name="type" fixed_value="0x593"/>
+			<field type="u32" name="guildid"/>
+			<field type="string" name="name" length="32"/>
+			<field type="string" name="leader" length="32"/>
+			<field type="u32" name="leader_charid"/>
+			<field type="u32" name="unknown2"/> <!-- 0xc6 ? -->
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="level" format="decimal"/>
+			<field type="u32" name="unknown4"/> <!-- 0 -->
+			<field type="u32" name="maxmembers" format="decimal"/>
+			<field type="u32" name="gold" format="decimal"/>
+			<field type="u32" name="rubies" format="decimal"/>
+			<field type="u32" name="ore" format="decimal"/>
+			<field type="u32" name="wood" format="decimal"/>
+			<field type="u32" name="herbs" format="decimal"/>
+			<field type="u32" name="runes" format="decimal"/>
+			<field type="u32" name="stones" format="decimal"/>
+			<field type="u32" name="unknown5" count="21"/>
+			<field type="string" name="announcement" length="512"/>
+			<field type="string" name="description" length="512"/>
+			<field type="u32" name="numranks" format="decimal"/> <!-- 10 -->
+			<field type="guild_rank" name="rank0"/>
+			<field type="guild_rank" name="rank1"/>
+			<field type="guild_rank" name="rank2"/>
+			<field type="guild_rank" name="rank3"/>
+			<field type="guild_rank" name="rank4"/>
+			<field type="guild_rank" name="rank5"/>
+			<field type="guild_rank" name="rank6"/>
+			<field type="guild_rank" name="rank7"/>
+			<field type="guild_rank" name="rank8"/>
+			<field type="guild_rank" name="rank9"/>
+			<field type="u8" name="unknown6" count="352" display="16" /> <!-- wonder if this is the flag? -->
+			<field type="u32" name="curmembers" format="decimal"/>
+		</subpacket>
+
+		<subpacket name="unknown595">
+			<field type="u32" name="type" fixed_value="0x595"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="guildid"/>
+		</subpacket>
+
+		<subpacket name="GuildMember">
+			<field type="u32" name="type" fixed_value="0x596"/>
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="rank" format="decimal"/>
+			<field type="u32" name="class1" enumeration="class" />
+			<field type="u32" name="class2" enumeration="class" />
+			<field type="u32" name="unknown1"/> <!-- 0 -->
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="unknown2"/> <!-- 0 -->
+			<field type="u32" name="unknown3"/> <!-- fixed accross guild members -->
+			<field type="u32" name="objectid" annotation="objectid"/> <!-- of 0xffffffff -->
+		</subpacket>
+
+		<!-- reply is 0x59f -->
+		<subpacket name="InviteToGuild">
+			<field type="u32" name="type" fixed_value="0x59e"/>
+			<field type="string" name="charname" length="64"/>
+			<field type="u32" name="charid"/>
+			<field type="u32" name="guildid"/>
+		</subpacket>
+
+		<subpacket name="GuildInviteAccepted">
+			<field type="u32" name="type" fixed_value="0x5a3"/>
+			<field type="string" name="inviter" length="64"/>
+			<field type="u32" name="guildid"/>
+		</subpacket>
+
+		<!-- always sent from target: datacenter -->
+		<subpacket name="unknown5d7">
+			<field type="u32" name="type" fixed_value="0x5d7"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<subpacket name="GuildList">
+			<field type="u32" name="type" fixed_value="0x5bd"/>
+			<field type="u32" name="guildid" />
+			<field type="string" name="name" length="64"/>
+			<field type="u8" name="unknown1" count="28"/>
+		</subpacket>
+
+		<!-- sent after joining a guild -->
+		<subpacket name="unknown5bf">
+			<field type="u32" name="type" fixed_value="0x5bf"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="guildid" />
+			<field type="string" name="charname" length="charname_length"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="unknown2" />
+			<field type="u8" name="skip1" count="512" display="16" /> <!-- leftover clutter? -->
+			<field type="u32" name="unknown3" />
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="unknown5" />
+			<field type="u32" name="class1" enumeration="class" />
+			<field type="u32" name="class2" enumeration="class" />
+			<field type="u32" name="unknown6"/> <!-- 0 -->
+			<field type="u32" name="level1" format="decimal"/>
+			<field type="u32" name="level2" format="decimal"/>
+			<field type="u32" name="unknown7" />
+		</subpacket>
+
+		<subpacket name="SetObjectGuild">
+			<field type="u32" name="type" fixed_value="0x5e2"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="guildid" />
+		</subpacket>
+
+		<!-- reply to unknown601 - without this, we can't answer NPC dialog -->
+		<subpacket name="unknown603">
+			<field type="u32" name="type" fixed_value="0x603"/>
+			<field type="u32" name="unknown1" /> <!-- always zero? sending obscenely large values crashes -->
+		</subpacket>
+
+		<subpacket name="HouseInfo">
+			<field type="u32" name="type" fixed_value="0x842"/>
+			<field type="u32" name="houseid" />
+			<field type="u32" name="unknown1" /> <!-- 0xa -->
+			<field type="u32" name="unknown2" /> <!-- 0 -->
+			<field type="u32" name="housetype" />
+			<field type="u32" name="unknown3" />
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u8" name="unknown4" min_count="0" count="1048576" display="16" />
+		</subpacket>
+
+		<subpacket name="unknown8cd">
+			<field type="u32" name="type" fixed_value="0x8cd"/>
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<subpacket name="unknown92e">
+			<field type="u32" name="type" fixed_value="0x92e"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<!-- somtimes float, sometimes not? -->
+			<field type="u32" name="unknown1" />
+		</subpacket>
+
+		<!-- NPC loot box ? seems reply to 92f? -->
+		<subpacket name="unknown931">
+			<field type="u32" name="type" fixed_value="0x931"/>
+			<field type="u32" name="objectid" annotation="objectid"/>
+			<field type="u32" name="unknown1" />
+			<field type="u32" name="itemid1" annotation="sys_name"/>
+			<field type="u32" name="itemid2" annotation="sys_name"/>
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="unknown5" />
+			<field type="u32" name="unknown6" />
+			<field type="u32" name="unknown7" />
+			<field type="u32" name="unknown8" />
+			<field type="u32" name="unknown9" />
+			<field type="u32" name="unknown10" />
+			<field type="u32" name="unknown11" />
+			<field type="u32" name="unknown12" />
+			<field type="u32" name="unknown13" />
+			<field type="u32" name="unknown14" />
+			<field type="u32" name="unknown15" />
+			<field type="u32" name="unknown16" />
+			<field type="u32" name="unknown17" />
+			<field type="u32" name="unknown18" />
+			<field type="u32" name="itemid3" annotation="sys_name"/>
+			<field type="u32" name="itemid4" annotation="sys_name"/>
+			<field type="u32" name="unknown21" />
+			<field type="u32" name="unknown22" />
+			<field type="u32" name="unknown23" />
+			<field type="u32" name="unknown24" />
+			<field type="u32" name="unknown25" />
+			<field type="u32" name="unknown26" />
+			<field type="u32" name="unknown27" />
+			<field type="u32" name="unknown28" />
+			<field type="u32" name="unknown29" />
+			<field type="u32" name="unknown30" />
+			<field type="u32" name="unknown31" />
+			<field type="u32" name="unknown32" />
+			<field type="u32" name="unknown33" />
+			<field type="u32" name="unknown34" />
+			<field type="u32" name="unknown35" />
+		</subpacket>
+
+		<subpacket name="unknown964">
+			<field type="u32" name="type" fixed_value="0x964"/>
+			<field type="u32" name="unknown1" /> <!-- seems to be incrementing -->
+			<field type="u32" name="unknown2" />
+			<field type="u32" name="unknown3" />
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="unknown5" />
+			<field type="u32" name="unknown6" />
+			<field type="u32" name="unknown7" />
+		</subpacket>
+
+		<!-- guild vault? -->
+		<subpacket name="unknown9dd">
+			<field type="u32" name="type" fixed_value="0x9dd"/>
+			<field type="u32" name="page" format="decimal" />
+			<field type="u32" name="unknown2" /> <!-- always 2? -->
+			<field type="u32" name="unknown3" /> <!-- always 0? -->
+			<field type="u32" name="item_count" format="decimal" />
+			<field type="guild_item" name="gitem"/>
+			<field type="u32" name="data" min_count="0" count="65536" display="1024"/>
+		</subpacket>
+
+		<subpacket name="unknown9df">
+			<field type="u32" name="type" fixed_value="0x9df"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="page" format="decimal"/>
+			<field type="u32" name="position" format="decimal"/>
+			<field type="u32" name="unknown4"/>
+			<field type="u32" name="unknown5"/>
+		</subpacket>
+
+		<!-- send for guild vault item updates? -->
+		<subpacket name="unknown9fb">
+			<field type="u32" name="type" fixed_value="0x9fb"/>
+			<field type="u32" name="guildid"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+			<field type="u32" name="charid" annotation="charid"/>
+			<field type="u32" name="itemid" format="decimal" annotation="sys_name"/>
+			<field type="u32" name="quantity" format="decimal"/>
+			<field type="u32" name="unknown8"/>
+			<field type="u32" name="unknown9"/>
+		</subpacket>
+
+		<!-- sent when a pet production item slot is to be updated -->
+		<subpacket name="PetProductionItem">
+			<field type="u32" name="type" fixed_value="0xa36"/>
+			<field type="u32" name="unknown1"/> <!-- always 2 -->
+			<field type="u32" name="slot"/>
+			<field type="u32" name="itemid1" annotation="sys_name"/>
+			<field type="u32" name="itemid2" annotation="sys_name"/>
+			<field type="u32" name="unknown3" />
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="count" format="decimal"/>
+			<field type="u32" name="unknown6" count="12"/>
+		</subpacket>
+
+		<!-- XXX TODO; not correct yet -->
+		<subpacket name="SiegeWarBattles">
+			<field type="u32" name="type" fixed_value="0xb5b"/>
+			<field type="u32" name="charid" annotation="charid"/> <!-- of current character -->
+			<field type="u32" name="unknown2" /> <!-- 4 -->
+			<field type="u32" name="unknown3" /> <!-- 2 -->
+			<field type="u32" name="unknown4" />
+			<field type="u32" name="unknown5" />
+			<field type="sw_battle" name="battle1"/>
+			<field type="sw_battle" name="battle2"/>
+			<field type="sw_battle" name="battle3"/>
+			<field type="sw_battle" name="battle4"/>
+			<field type="sw_battle" name="battle5"/>
+			<field type="sw_battle" name="battle6"/>
+			<field type="sw_battle" name="battle7"/>
+			<field type="sw_battle" name="battle8"/>
+			<field type="sw_battle" name="battle9"/>
+			<field type="sw_battle" name="battle10"/>
+		</subpacket>
+
+		<!-- reply to unknownbbf ? -->
+		<subpacket name="unknownbc2">
+			<field type="u32" name="type" fixed_value="0xbc2"/>
+			<field type="u32" name="value" format="decimal"/>
+			<field type="u32" name="unknown1"/>
+			<field type="u32" name="unknown2"/>
+			<field type="u32" name="unknown3"/>
+		</subpacket>
+
+		<!-- reply to by unknownbc3 - I think this covers daily reset times -->
+		<subpacket name="unknownbc5">
+			<field type="u32" name="type" fixed_value="0xbc5"/>
+			<field type="u32" name="value" format="decimal"/>
+			<field type="u32" name="unknown1"/>
+			<field type="unixtime" name="timestamp1"/> <!-- today, 5AM -->
+			<field type="unixtime" name="timestamp2"/> <!-- tomorrow, 5AM -->
+		</subpacket>
+
+		<!-- answer to 0xbc8 -->
+		<subpacket name="SysVarReply">
+			<field type="u32" name="type" fixed_value="0xbc9"/>
+			<field type="string" name="name" length="32"/>
+			<field type="u32" name="value" />
+		</subpacket>
+
+	  <!-- no idea; sent after entering a new zone -->
+		<subpacket name="unknownc1c">
+			<field type="u32" name="type" fixed_value="0xc1c"/>
+			<field type="u32" name="unknown1" format="decimal"/>
+		</subpacket>
+
+		<!-- this may be zone event countdown -->
+		<subpacket name="unknownc24">
+			<field type="u32" name="type" fixed_value="0xc24"/>
+			<field type="u32" name="unknown1" format="decimal"/>
+			<field type="u32" name="unknown2" format="decimal"/>
+			<field type="u32" name="unknown3" format="decimal"/>
+			<field type="u32" name="unknown4" format="decimal"/> <!-- counts down -->
+		</subpacket>
+
+		<!-- reply to unknown1130 -->
+		<subpacket name="unknown1040">
+			<field type="u32" name="type" fixed_value="0x1040"/>
+			<field type="u32" name="unknown1" format="decimal" />
+			<field type="u32" name="unknown2" format="decimal" />
+			<field type="u32" name="unknown3" format="decimal" />
+			<field type="u32" name="unknown4" format="decimal" />
+			<field type="u32" name="unknown5" format="decimal" />
+			<field type="u32" name="unknown6" format="decimal" />
+			<field type="u32" name="unknown7" format="decimal" />
+		</subpacket>
+	</packet>
+
+	<packet name="unknown9d" source="server">
+		<field type="u32" name="type" fixed_value="0x9d"/>
+	</packet>
+
+	<packet name="ClientQuit" source="client">
+		<field type="u32" name="type" fixed_value="0x9e"/>
+		<field type="u32" name="unknown1"/> <!-- reason? -->
+	</packet> 
+
+</protocol>
+<!-- vim:set ts=2 sw=2: -->
