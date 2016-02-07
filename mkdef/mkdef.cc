@@ -44,10 +44,11 @@ write_header(FILE* f)
 static void
 usage(const char* progname)
 {	
-	fprintf(stderr, "usage: %s [-h?] -d protocol.xml -c file.cc -p file.cc -i file.h\n", progname);
+	fprintf(stderr, "usage: %s [-h?] [-v version] -d protocol.xml -c file.cc -p file.cc -i file.h\n", progname);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "  -h, -?             this help\n");
 	fprintf(stderr, "  -d protocol.xml    use supplied protocol definitions\n");
+	fprintf(stderr, "  -v version         protocol version to use (default is latest)\n");
 	fprintf(stderr, "  -c file.cc         write c++ code to file.cc\n");
 	fprintf(stderr, "  -p file.cc         write python wrappers to file.cc\n");
 	fprintf(stderr, "  -i file.h          write header file to file.h\n");
@@ -64,13 +65,14 @@ main(int argc, char** argv)
 	oProtocolDef.RegisterAnnotation("objectid", *new DummyAnnotation);
 	oProtocolDef.RegisterAnnotation("charid", *new DummyAnnotation);
 
+	int iVersion = -1;
 	char* sCPPFile = NULL;
 	char* sPythonCPPFile = NULL;
 	char* sHFile = NULL;
 	char* sProtocolDefFile = NULL;
 	{
 		int opt;
-		while ((opt = getopt(argc, argv, "?hd:i:c:p:")) != -1) {
+		while ((opt = getopt(argc, argv, "?hd:i:c:v:p:")) != -1) {
 			switch(opt) {
 				case 'd':
 					sProtocolDefFile = optarg;
@@ -89,6 +91,13 @@ main(int argc, char** argv)
 				case 'p':
 					sPythonCPPFile = optarg;
 					break;
+				case 'v': {
+					char* ptr;
+					iVersion = (int)strtol(optarg, &ptr, 10);
+					if (*ptr != '\0')
+						errx(1, "version '%s' cannot be parsed", optarg);
+					break;
+				}
 			}
 		}
 	}
@@ -99,7 +108,7 @@ main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	if (!oProtocolDef.Load(sProtocolDefFile))
+	if (!oProtocolDef.Load(sProtocolDefFile, iVersion))
 		errx(1, "can't load protocol definitions");
 
 	FILE* pCFile = fopen(sCPPFile, "wt");

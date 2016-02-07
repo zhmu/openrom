@@ -360,7 +360,7 @@ ROMPacking::EstimateBufferSize(const uint8_t* pSource, int iSourceLen)
 static void
 usage(const char* progname)
 {	
-	fprintf(stderr, "usage: %s [-hkuxyo?] [-d protocol.xml] [-i filter] [-j filter] [-s sysfile.csv] file.txt\n", progname);
+	fprintf(stderr, "usage: %s [-hkuxyo?] [-d protocol.xml] [-i filter] [-j filter] [-s sysfile.csv] [-v version] file.txt\n", progname);
 	fprintf(stderr, "\n");
 	fprintf(stderr, "  -h, -?             this help\n");
 	fprintf(stderr, "  -d protocol.xml    use supplied protocol definitions\n");
@@ -373,8 +373,10 @@ usage(const char* progname)
 	fprintf(stderr, "  -j [filter]        only accept packets matching [filter]\n");
 	fprintf(stderr, "  -s sysfile.csv     use Sys_... ID definitions\n");
 	fprintf(stderr, "  -u                 ignore unrecognized packets\n");
+	fprintf(stderr, "  -v version         use the given protocol version\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "filter are comma-separated and match by packet type. A subpacket can be matched by using 'packet:subpacket'\n");
+	fprintf(stderr, "default version will be the highest available\n");
 }
 
 static void
@@ -568,11 +570,12 @@ main(int argc, char** argv)
 
 	{
 		int opt;
-		while ((opt = getopt(argc, argv, "?hd:i:j:ks:uxyo")) != -1) {
+		int protocol_ver = -1;
+		const char* protocol_def = NULL;
+		while ((opt = getopt(argc, argv, "?hd:i:j:ks:uv:xyo")) != -1) {
 			switch(opt) {
 				case 'd':
-					if (!g_ProtocolDef.Load(optarg))
-						errx(1, "can't load protocol definitions");
+					protocol_def = optarg;
 					break;
 				case 'k':
 					g_DisplayFlags |= DISPLAY_SHOW_KEEPALIVE;
@@ -599,6 +602,13 @@ main(int argc, char** argv)
 				case 'o':
 					g_ProtocolDef.SetPrintDataOffset(true);
 					break;
+				case 'v': {
+					char* ptr;
+					protocol_ver = (int)strtol(optarg, &ptr, 10);
+					if (*ptr != '\0')
+						errx(1, "version '%s' cannot be parsed", optarg);
+					break;
+				}
 				case 'h':
 				case '?':
 				default:
@@ -606,6 +616,9 @@ main(int argc, char** argv)
 					return EXIT_FAILURE;
 			}
 		}
+
+		if (protocol_def != NULL && !g_ProtocolDef.Load(protocol_def, protocol_ver))
+			errx(1, "can't load protocol definitions");
 	}
 
 	if (optind >= argc) {

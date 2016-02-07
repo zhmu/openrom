@@ -389,6 +389,12 @@ public:
 		 */
 		virtual bool ParseExtraNode(xmlNodePtr pNode, const char* sName);
 
+		/*! \brief Parses the actual child node
+		 *  \param pNode Node to parse
+		 *  \returns true on success
+		 */
+		bool ParseChildNode(xmlNodePtr pNode);
+
 		TXActionPtrList m_Actions;
 
 		//! \brief Number of values
@@ -448,9 +454,10 @@ public:
 
 	/*! \brief Loads protocol definitions from a file
 	 *  \param sFilename Filename to use
+	 *  \param iVersion Version to load, -1 for latest
 	 *  \returns true on success
 	 */
-	bool Load(const char* sFilename);
+	bool Load(const char* sFilename, int iVersion);
 
 	/*! \brief Processes a decrypted packet payload
 	 *  \param pData Data to process
@@ -782,6 +789,9 @@ protected:
 	 *  This is here because all Type::Print() functions need to access it...
 	 */
 	static bool s_MustPrintDataOffset;
+
+	//!  \brief Version to load
+	int m_Version;
 };
 
 #endif /* __PROTOCOLDEFINITION_H__ */

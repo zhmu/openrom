@@ -280,6 +280,44 @@ ProtocolDefinition::Struct::ParseExtraNode(xmlNodePtr pNode, const char* sName)
 }
 
 bool
+ProtocolDefinition::Struct::ParseChildNode(xmlNodePtr pNode)
+{
+	bool bOK = false;
+	xmlChar* sName = xmlGetProp(pNode, (const xmlChar*)"name");
+	if (sName == NULL) {
+		fprintf(stderr, "ProtocolDefinition::Struct::ParseChildNode(): missing name attribute\n");
+		return bOK;
+	}
+
+	xmlChar* sType = NULL;
+	if (xmlStrcmp(pNode->name, (const xmlChar*)"field") == 0) {
+		sType = xmlGetProp(pNode, (const xmlChar*)"type");
+		if (sType != NULL) {
+			const Type* poType = m_ProtocolDefinition.LookupType((const char*)sType);
+			if (poType != NULL) {
+				// Hook the type up to the struct
+				Field* pField = new Field(*poType, (const char*)sName);
+				AddAction(pField);
+				bOK = pField->GetType().ParseNode(pNode);
+			} else {
+				fprintf(stderr, "ProtocolDefinition::Struct::ParseChildNode(): type '%s' not recognized (name '%s')\n", sType, sName);
+			}
+		} else {
+			fprintf(stderr, "ProtocolDefinition::Struct::ParseChildNode(): missing type attribute\n");
+		}
+	} else if (ParseExtraNode(pNode, (const char*)sName)) {
+		bOK = true;
+	} else {
+		fprintf(stderr, "ProtocolDefinition::Struct::ParseChildNode(): found unrecognized node '%s'\n", pNode->name);
+	}
+	if (sType != NULL)
+		xmlFree(sType);
+	if (sName != NULL)
+		xmlFree(sName);
+	return bOK;
+}
+
+bool
 ProtocolDefinition::Struct::ParseNode(xmlNodePtr pNode)
 {
 	bool bOK = true;
@@ -287,41 +325,34 @@ ProtocolDefinition::Struct::ParseNode(xmlNodePtr pNode)
 		if (pNode->type != XML_ELEMENT_NODE)
 			continue;
 
-		bOK = false;
-		xmlChar* sName = xmlGetProp(pNode, (const xmlChar*)"name");
-		if (sName == NULL) {
-			fprintf(stderr, "ProtocolDefinition::Struct::ParseNode(): missing name attribute\n");
-			break;
-		}
-
-		xmlChar* sType = NULL;
-		if (xmlStrcmp(pNode->name, (const xmlChar*)"field") == 0) {
-			sType = xmlGetProp(pNode, (const xmlChar*)"type");
-			if (sType != NULL) {
-				const Type* poType = m_ProtocolDefinition.LookupType((const char*)sType);
-				if (poType == NULL) {
-					fprintf(stderr, "ProtocolDefinition::Struct::ParseNode(): type '%s' not recognized (name '%s')\n", sType, sName);
-					break;
-				}
-
-				// Hook the type up to the struct
-				Field* pField = new Field(*poType, (const char*)sName);
-				AddAction(pField);
-				bOK = pField->GetType().ParseNode(pNode);
-			} else { 
-				fprintf(stderr, "ProtocolDefinition::Struct::ParseNode(): missing type attribute\n");
-				break;
+		if(xmlStrcmp(pNode->name, (const xmlChar*)"filter") == 0) {
+			xmlChar* sVersion = xmlGetProp(pNode, (const xmlChar*)"version");
+			if (sVersion == NULL) {
+				fprintf(stderr, "ProtocolDefinition::Struct::ParseNode(): 'filter' node without a version\n");
+				return false;
 			}
-		} else if (ParseExtraNode(pNode, (const char*)sName)) {
-			bOK = true;
-		} else {
-			fprintf(stderr, "ProtocolDefinition::Struct::ParseNode(): found unrecognized node '%s'\n", pNode->name);
-			break;
+
+			char* ptr;
+			int version = (int)strtol((const char*)sVersion, &ptr, 10);
+			if (sVersion == '\0' || *ptr != '\0') {
+				fprintf(stderr, "ProtocolDefinition::Struct::ParseNode(): 'filter' node with version '%s' which cannot be parsed\n", sVersion);
+				return false;
+			}
+			xmlFree(sVersion);
+
+			if (m_ProtocolDefinition.m_Version < 0 /* ignore version */ ||
+				  m_ProtocolDefinition.m_Version >= version /* node is at least what we want */) {
+				for (xmlNodePtr pChildNode = pNode->children; bOK && pChildNode != NULL; pChildNode = pChildNode->next) {
+					if (pChildNode->type != XML_ELEMENT_NODE)
+						continue;
+					if (!ParseChildNode(pChildNode))
+						return false;
+				}
+			}
+			continue;
 		}
-		if (sType != NULL)
-			xmlFree(sType);
-		if (sName != NULL)
-			xmlFree(sName);
+
+		bOK = ParseChildNode(pNode);
 	}
 
 	return bOK;
@@ -804,6 +835,7 @@ ProtocolDefinition::unixtimeType::GenerateCInitialize(char* sCode, int iLength) 
 }
 
 ProtocolDefinition::ProtocolDefinition()
+	: m_Version(0)
 {
 	m_Types.push_back(new unsignedType(*this, "u8", sizeof(uint8_t)));
 	m_Types.push_back(new unsignedType(*this, "u16", sizeof(uint16_t)));
@@ -1044,8 +1076,10 @@ ProtocolDefinition::ParsePacket(xmlNodePtr pNode)
 }
 
 bool
-ProtocolDefinition::Load(const char* sFilename)
+ProtocolDefinition::Load(const char* sFilename, int iVersion)
 {
+	m_Version = iVersion;
+
 	xmlDocPtr pDoc = xmlReadFile(sFilename, NULL, 0);
 	if (pDoc == NULL) {
 		printf("ProtocolDefinition::Load(): cannot parse '%s'\n", sFilename);
