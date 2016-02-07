@@ -17,10 +17,9 @@
   -->
 
 <!--
-    Note: if you are using this file to analyse a more recent version of the
-    game than 6.0.5.2679.en, you'll need to update the 'char_info' structure as
-    some fields have been added to it since then; search for UPDATE and
-    uncomment the fields.
+    versions are encoded as the number listed in the game without any dots;
+    for example, 6.5.3.2762 is encoded as 6532762. the initial version of
+    this protocol was 6.0.5.2679.
   -->
 <protocol>
 	<define name="accountname_length" value="64"/>
@@ -1555,16 +1554,20 @@
 		<field type="u32" name="shells" format="decimal"/>
 		<field type="u32" name="justice_energy" format="decimal"/>
 		<field type="u32" name="skip16" count="3" />
-		<!-- offset 180b8: used to be account info; UPDATE added a bunch of zero's here -->
-		<!-- UPDATE: <field type="u8" name="skip17" count="1248" display="1" /> -->
+		<!-- offset 180b8: used to be account info -->
+		<filter version="6532762">
+			<!-- seems just a bunch of zero's? -->
+			<field type="u8" name="skip17" count="1248" display="1" />
+		</filter>
 		<field type="u32" name="charid" annotation="charid"/>
 		<field type="string" name="accountname" length="accountname_length"/>
 		<field type="string" name="date" length="24"/>
 		<field type="u32" name="unknown34" />
 		<field type="unixtime" name="last_online" /> <!-- unix timestamp -->
 		<field type="u32" name="unknown35" count="9" />
-		<!-- next is needed for updated verions as well -->
-		<!-- UPDATE: <field type="u8" name="skip18" count="96" display="1" /> -->
+		<filter version="6532762">
+			<field type="u8" name="skip18" count="96" display="1" />
+		</filter>
 	</struct>
 
 	<struct name="sw_battle">
