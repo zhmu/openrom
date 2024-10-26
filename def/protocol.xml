@@ -538,7 +538,7 @@
 		<!-- skip 5x char_class; these may be for future expansion -->
 		<field type="u8" name="char_unused" count="5300" display="1" />
 		<!-- 0x6930: new section: items -->
-		<field type="u32" name="unknown11"/> <!-- 50, 5a - levelcap maybe ? -->
+		<field type="u32" name="levelcap" format="decimal"/>
 		<field type="u32" name="unknown12"/> <!-- not always zero, maybe count? -->
 		<field type="u32" name="unknown13"/> <!-- not always zero, maybe count? -->
 		<field type="u32" name="unknown14" count="8"/> <!-- padding? -->
@@ -1142,8 +1142,12 @@
 		<field type="item_info" name="item583"/>
 		<!-- no idea what this is -->
 		<field type="u32" name="skip5" count="1130" /> <!-- all zero ? -->
-		<!-- offset 11610: wonder if this is quest state? -->
-		<field type="u32" name="skip7" count="136" />
+		<!-- offset 11610: titles, cards -->
+		<!-- per-title have is simply a bit, offset 430000
+		     or have(q) = titles_have[(q / 8) - 430000] & (1 << (q % 8)) -->
+		<field type="u8" name="titles_have" count="256" />
+		<field type="u8" name="cards_have" count="256" />
+		<field type="u8" name="skip7" count="32" /> <!-- all zero ? -->
 		<!-- offset 11830: inventory backpack order -->
 		<field type="u8" name="backpack_order" count="256" format="decimal" />
 		<!-- offset 11930: quest data -->
@@ -1479,7 +1483,7 @@
 		<field type="u32" name="setskill199" format="decimal" annotation="sys_name"/>
 		<field type="u32" name="setskill200" format="decimal" annotation="sys_name"/>
 		<!-- offset 1666c: equip set skills -->
-		<field type="u32" name="unknown29" /> <!-- always 3? -->
+		<field type="u32" name="max_equippedsetskills" /> <!-- 3 or 4, depending on level -->
 		<field type="u32" name="equippedsetskill1"  format="decimal" annotation="sys_name"/>
 		<field type="u32" name="equippedsetskill2"  format="decimal" annotation="sys_name"/>
 		<field type="u32" name="equippedsetskill3"  format="decimal" annotation="sys_name"/>
